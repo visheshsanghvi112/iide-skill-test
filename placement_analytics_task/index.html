@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Analytics & Executive Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <i class="fa-solid fa-graduation-cap logo-icon"></i>
+                <div class="logo-text">
+                    <h2>Campus</h2>
+                    <span>PLACEMENTS</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="dashboard">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-tab="schema">
+                    <i class="fa-solid fa-database"></i> Relational Schema
+                </a>
+                <a href="#" class="nav-item" data-tab="sandbox">
+                    <i class="fa-solid fa-code"></i> SQL Sandbox
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>Data & Placements Analyser v1.0</p>
+                <span>Created for Executive Board</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-title">
+                    <h1 id="page-title">Executive Dashboard</h1>
+                    <p id="page-subtitle">Real-time placement funnel metrics and recruitment performance analysis</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="refresh-data-btn">
+                        <i class="fa-solid fa-rotate"></i> Refresh Analytics
+                    </button>
+                </div>
+            </header>
+
+            <!-- TAB 1: DASHBOARD VIEW -->
+            <section id="tab-dashboard" class="tab-content active">
+                <!-- KPI Banner Grid -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper blue">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Total Enrolments</h3>
+                            <div class="value" id="kpi-registered">113</div>
+                            <span class="trend">Total registered students</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper purple">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Placement Eligible</h3>
+                            <div class="value" id="kpi-eligible">38</div>
+                            <span class="trend highlight"><b id="eligible-pct">33.6%</b> of total registrations</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper green">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Hired & Placed</h3>
+                            <div class="value" id="kpi-placed">16</div>
+                            <span class="trend success"><b id="hired-pct">42.1%</b> eligible placement rate</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper orange">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Job Openings</h3>
+                            <div class="value" id="kpi-jobs">7,708</div>
+                            <span class="trend warning"><b id="kpi-active-jobs">289</b> active postings</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Layout Grid -->
+                <div class="dashboard-grid">
+                    <!-- Funnel Analysis Card -->
+                    <div class="card span-2">
+                        <div class="card-header">
+                            <h3>Placement Ingestion Funnel</h3>
+                            <span class="card-subtitle">Dropouts across successive recruitment stages</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chart-funnel" height="260"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Dropout Bottlenecks Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Student Knock-off Reasons</h3>
+                            <span class="card-subtitle">Master enrolment dropout causes</span>
+                        </div>
+                        <div class="card-body flex-center">
+                            <canvas id="chart-knockoffs" height="230"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Batch Performance Analysis -->
+                    <div class="card span-2">
+                        <div class="card-header">
+                            <h3>Batch Performance Comparison</h3>
+                            <span class="card-subtitle">Student distribution and hiring outcomes per training cohort</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chart-batches" height="260"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Interview Cancellations Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Interview Cancel Reasons</h3>
+                            <span class="card-subtitle">Reasons for scheduled round cancellations</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chart-cancellations" height="230"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Top Skills Grid -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Top Candidate Skills</h3>
+                            <span class="card-subtitle">Most frequent skills in eligible candidates</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chart-skills" height="230"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Demographics: Location preference -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Preferred Work Location</h3>
+                            <span class="card-subtitle">Work style/office preference</span>
+                        </div>
+                        <div class="card-body flex-center">
+                            <canvas id="chart-locations" height="230"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Top Hiring Roles -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Top Job Postings</h3>
+                            <span class="card-subtitle">Highest volume roles in Job Openings</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chart-roles" height="230"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Executive Operational Insights -->
+                <div class="dashboard-grid mt-4">
+                    <div class="card span-3">
+                        <div class="card-header flex-between">
+                            <div>
+                                <h3>Recruiter-Tracker Integrity Discrepancies</h3>
+                                <span class="card-subtitle warning-text"><i class="fa-solid fa-circle-exclamation"></i> Identified 5 candidates marked as 'Hired' in Enrolments but missing matching 'Hired' application workflows</span>
+                            </div>
+                            <span class="badge badge-warning">Process Compliance Gap</span>
+                        </div>
+                        <div class="card-body table-container">
+                            <table class="data-table" id="discrepancy-table">
+                                <thead>
+                                    <tr>
+                                        <th>Enrolment ID</th>
+                                        <th>Candidate ID</th>
+                                        <th>Candidate Name</th>
+                                        <th>Enrolment Stage</th>
+                                        <th>Application Ingestion Integrity Issue</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="discrepancy-rows">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <i class="fa-solid fa-circle-info"></i> <strong>Executive Takeaway</strong>: Candidates Naomi Bennett, Eva Hughes, and Madison Young have 0 applications in the recruiter system but are marked 'Hired' in Enrolments (likely off-campus or direct placements). Henry Gonzalez and Abigail Sanchez have active applications but their final status remains un-updated in the recruitment table.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: SCHEMA GRAPH VIEW -->
+            <section id="tab-schema" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Relational Database Schema Design (3NF Normalized)</h3>
+                        <span class="card-subtitle">Visual Entity-Relationship Architecture optimized for referential integrity & zero redundancy</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="schema-layout">
+                            <!-- Table representation cards -->
+                            <div class="schema-table">
+                                <div class="table-title header-enrolments">enrolments</div>
+                                <div class="table-fields">
+                                    <div class="field pk">enrolment_id <span>TEXT (PK)</span></div>
+                                    <div class="field">enrolment_owner <span>TEXT</span></div>
+                                    <div class="field">enrolment_name <span>TEXT</span></div>
+                                    <div class="field">first_name <span>TEXT</span></div>
+                                    <div class="field">last_name <span>TEXT</span></div>
+                                    <div class="field">email <span>TEXT</span></div>
+                                    <div class="field">batch_name <span>TEXT</span></div>
+                                    <div class="field">stage <span>TEXT</span></div>
+                                    <div class="field fk">candidate_id <span>TEXT (FK → candidates)</span></div>
+                                    <div class="field">created_time <span>TEXT</span></div>
+                                    <div class="field">job_role_preference_1 <span>TEXT</span></div>
+                                    <div class="field">job_role_preference_2 <span>TEXT</span></div>
+                                    <div class="field">knocked_off_reason <span>TEXT</span></div>
+                                    <div class="field">on_hold_reason <span>TEXT</span></div>
+                                    <div class="field">course_name <span>TEXT</span></div>
+                                    <div class="field">preferred_job_type <span>TEXT</span></div>
+                                    <div class="field">college_name <span>TEXT</span></div>
+                                    <div class="field">degree <span>TEXT</span></div>
+                                    <div class="field">graduation_year <span>TEXT</span></div>
+                                </div>
+                            </div>
+
+                            <div class="schema-connector">
+                                <i class="fa-solid fa-link"></i>
+                                <span>1 : 0..1</span>
+                            </div>
+
+                            <div class="schema-table">
+                                <div class="table-title header-candidates">candidates</div>
+                                <div class="table-fields">
+                                    <div class="field pk">candidate_id <span>TEXT (PK)</span></div>
+                                    <div class="field">first_name <span>TEXT</span></div>
+                                    <div class="field">last_name <span>TEXT</span></div>
+                                    <div class="field">phone_number <span>TEXT</span></div>
+                                    <div class="field">email <span>TEXT (UNIQUE)</span></div>
+                                    <div class="field">city <span>TEXT</span></div>
+                                    <div class="field">province <span>TEXT</span></div>
+                                    <div class="field">country <span>TEXT</span></div>
+                                    <div class="field">skill_set <span>TEXT</span></div>
+                                    <div class="field">candidate_stage <span>TEXT</span></div>
+                                    <div class="field">batch_name <span>TEXT</span></div>
+                                    <div class="field">age <span>INTEGER</span></div>
+                                    <div class="field">preferred_job_location <span>TEXT</span></div>
+                                    <div class="field">gender <span>TEXT</span></div>
+                                    <div class="field">strength_area_1 <span>TEXT</span></div>
+                                    <div class="field">strength_area_2 <span>TEXT</span></div>
+                                </div>
+                            </div>
+
+                            <div class="schema-connector">
+                                <i class="fa-solid fa-link"></i>
+                                <span>1 : N</span>
+                            </div>
+
+                            <div class="schema-table">
+                                <div class="table-title header-applications">applications</div>
+                                <div class="table-fields">
+                                    <div class="field pk">application_id <span>TEXT (PK)</span></div>
+                                    <div class="field fk">candidate_id <span>TEXT (FK → candidates)</span></div>
+                                    <div class="field fk">job_opening_id <span>TEXT (FK → openings)</span></div>
+                                    <div class="field">application_stage <span>TEXT</span></div>
+                                    <div class="field">application_status <span>TEXT</span></div>
+                                    <div class="field">created_time <span>TEXT</span></div>
+                                    <div class="field">batch_name <span>TEXT</span></div>
+                                </div>
+                            </div>
+
+                            <div class="schema-connector-vertical">
+                                <i class="fa-solid fa-link"></i>
+                                <span>1 : N</span>
+                            </div>
+
+                            <div class="schema-table">
+                                <div class="table-title header-interviews">interviews</div>
+                                <div class="table-fields">
+                                    <div class="field pk">interview_id <span>TEXT (PK)</span></div>
+                                    <div class="field">interview_owner_id <span>TEXT</span></div>
+                                    <div class="field">interview_name <span>TEXT</span></div>
+                                    <div class="field">client_id <span>TEXT</span></div>
+                                    <div class="field fk">application_id <span>TEXT (FK → apps)</span></div>
+                                    <div class="field">from_time <span>TEXT</span></div>
+                                    <div class="field">to_time <span>TEXT</span></div>
+                                    <div class="field">interview_type <span>TEXT</span></div>
+                                    <div class="field">interview_status <span>TEXT</span></div>
+                                    <div class="field">batch_name <span>TEXT</span></div>
+                                    <div class="field">cancellation_reason <span>TEXT</span></div>
+                                    <div class="field">feedback <span>TEXT</span></div>
+                                    <div class="field">created_time <span>TEXT</span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="schema-table secondary-table" style="grid-column: 5; grid-row: 3;">
+                                <div class="table-title header-jobs">job_openings</div>
+                                <div class="table-fields">
+                                    <div class="field pk">job_opening_id <span>TEXT (PK)</span></div>
+                                    <div class="field">account_manager_id <span>TEXT</span></div>
+                                    <div class="field">job_type <span>TEXT</span></div>
+                                    <div class="field">posting_title <span>TEXT</span></div>
+                                    <div class="field">job_opening_status <span>TEXT</span></div>
+                                    <div class="field">date_opened <span>TEXT</span></div>
+                                    <div class="field">city <span>TEXT</span></div>
+                                    <div class="field">province <span>TEXT</span></div>
+                                    <div class="field">country <span>TEXT</span></div>
+                                    <div class="field">created_time <span>TEXT</span></div>
+                                    <div class="field">salary <span>TEXT</span></div>
+                                    <div class="field">profile <span>TEXT</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <p><strong>Database Architecture Summary</strong>: To remove the redundancies in the raw data files, we normalized the tables to 3NF. Redundant contact info (email, phone, name) was eliminated from <code>applications</code> since it can be joined via <code>candidate_id</code>. In addition, the <code>interviews</code> table connects directly to <code>applications</code> using the <code>application_id</code> foreign key, representing the exact logical relationship (interviews occur in the context of an application).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: SQL SANDBOX TAB -->
+            <section id="tab-sandbox" class="tab-content">
+                <div class="sandbox-layout">
+                    <!-- Editor Left Panel -->
+                    <div class="editor-panel">
+                        <div class="card">
+                            <div class="card-header flex-between">
+                                <div>
+                                    <h3>SQL Query Console</h3>
+                                    <span class="card-subtitle">Write and execute raw SQLite queries directly against the database</span>
+                                </div>
+                                <div class="editor-buttons">
+                                    <button class="btn btn-secondary btn-sm" id="clear-sql-btn">Clear</button>
+                                    <button class="btn btn-primary btn-sm" id="run-sql-btn">
+                                        <i class="fa-solid fa-play"></i> Run Query
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="sql-editor-wrapper">
+                                    <textarea id="sql-editor" placeholder="-- Type your SQL query here. Press Ctrl+Enter or click Run Query to execute.&#10;SELECT * FROM candidates LIMIT 5;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results Card -->
+                        <div class="card mt-4">
+                            <div class="card-header flex-between">
+                                <div>
+                                    <h3>Query Results</h3>
+                                    <span class="card-subtitle" id="query-result-meta">No query executed yet.</span>
+                                </div>
+                                <span class="badge" id="query-status-badge">Idle</span>
+                            </div>
+                            <div class="card-body table-container sql-results-container">
+                                <div class="empty-state" id="query-empty-state">
+                                    <i class="fa-solid fa-terminal"></i>
+                                    <p>Results will be displayed here as an interactive grid.</p>
+                                </div>
+                                <table class="data-table" id="query-results-table" style="display: none;">
+                                    <thead id="query-results-headers">
+                                        <!-- Dynamic headers -->
+                                    </thead>
+                                    <tbody id="query-results-rows">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Right Panel: Metadata & Examples -->
+                    <div class="schema-sidebar">
+                        <!-- Quick Queries -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Example Query Scenarios</h3>
+                                <span class="card-subtitle">Click to load and execute analytical SQL</span>
+                            </div>
+                            <div class="card-body examples-list">
+                                <button class="example-query-btn" data-sql="-- Scenario A: Fetch students and their matching placement candidate profile
+SELECT e.first_name, e.last_name, e.stage as EnrolmentStage, c.city, c.skill_set 
+FROM enrolments e 
+INNER JOIN candidates c ON e.candidate_id = c.candidate_id 
+LIMIT 10;">
+                                    <span class="query-title">1. Inner Join: Candidate Profiles</span>
+                                    <span class="query-desc">Links Enrolments to Candidates to see eligibility skillsets</span>
+                                </button>
+                                
+                                <button class="example-query-btn" data-sql="-- Scenario B: Identify top job roles with highest active openings
+SELECT posting_title, count(*) as OpeningsCount 
+FROM job_openings 
+WHERE job_opening_status = 'In-progress' 
+GROUP BY posting_title 
+ORDER BY OpeningsCount DESC 
+LIMIT 5;">
+                                    <span class="query-title">2. Aggregation: Active Roles</span>
+                                    <span class="query-desc">List open postings sorted by demand</span>
+                                </button>
+
+                                <button class="example-query-btn" data-sql="-- Scenario C: Recruitment funnel analysis (Hired rate per batch)
+SELECT 
+    batch_name, 
+    count(*) as TotalEnrolled, 
+    sum(case when stage = 'Hired' then 1 else 0 end) as TotalHired,
+    round(100.0 * sum(case when stage = 'Hired' then 1 else 0 end) / count(*), 1) as PlacedPercentage
+FROM enrolments 
+GROUP BY batch_name 
+ORDER BY PlacedPercentage DESC;">
+                                    <span class="query-title">3. Funnel: Batch Success Rates</span>
+                                    <span class="query-desc">Placed rates grouped by student batches</span>
+                                </button>
+
+                                <button class="example-query-btn" data-sql="-- Scenario D: Analyze interview cancellation reasons and feedback
+SELECT 
+    cancellation_reason, 
+    count(*) as CancelCount 
+FROM interviews 
+WHERE interview_status = 'Cancelled' AND cancellation_reason IS NOT NULL
+GROUP BY cancellation_reason 
+ORDER BY CancelCount DESC;">
+                                    <span class="query-title">4. Bottlenecks: Cancel Analysis</span>
+                                    <span class="query-desc">Investigate why interview rounds drop</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Database Reference Schema info -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h3>Reference Schema Info</h3>
+                                <span class="card-subtitle">List of available tables in SQLite</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="accordion">
+                                    <div class="accordion-item">
+                                        <button class="accordion-title">
+                                            <span>candidates</span>
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                        <div class="accordion-content">
+                                            <code>candidate_id, first_name, last_name, phone_number, email, city, province, country, skill_set, candidate_stage, batch_name, age, preferred_job_location, gender, strength_area_1, strength_area_2</code>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <button class="accordion-title">
+                                            <span>enrolments</span>
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                        <div class="accordion-content">
+                                            <code>enrolment_id, enrolment_owner, enrolment_name, first_name, last_name, email, batch_name, stage, candidate_id, created_time, job_role_preference_1, job_role_preference_2, knocked_off_reason, on_hold_reason, course_name, preferred_job_type, college_name, degree, graduation_year</code>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <button class="accordion-title">
+                                            <span>job_openings</span>
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                        <div class="accordion-content">
+                                            <code>job_opening_id, account_manager_id, job_type, posting_title, job_opening_status, date_opened, city, province, country, created_time, salary, profile</code>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <button class="accordion-title">
+                                            <span>applications</span>
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                        <div class="accordion-content">
+                                            <code>application_id, candidate_id, job_opening_id, application_stage, application_status, created_time, batch_name</code>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <button class="accordion-title">
+                                            <span>interviews</span>
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                        <div class="accordion-content">
+                                            <code>interview_id, interview_owner_id, interview_name, client_id, application_id, from_time, to_time, interview_type, interview_status, batch_name, cancellation_reason, feedback, created_time</code>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
