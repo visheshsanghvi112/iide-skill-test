@@ -2,17 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Current Chart instances registry (to destroy and rebuild on reload)
     const charts = {};
 
-    // Global Chart.js defaults
+    // Global Chart.js defaults — dark theme
     Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
-    Chart.defaults.font.size = 12;
+    Chart.defaults.font.size = 11;
     Chart.defaults.color = '#64748b';
-    Chart.defaults.plugins.tooltip.backgroundColor = '#0f172a';
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(8,12,22,0.95)';
     Chart.defaults.plugins.tooltip.titleColor = '#f1f5f9';
     Chart.defaults.plugins.tooltip.bodyColor = '#94a3b8';
-    Chart.defaults.plugins.tooltip.padding = 10;
-    Chart.defaults.plugins.tooltip.cornerRadius = 8;
-    Chart.defaults.plugins.tooltip.displayColors = false;
-    Chart.defaults.animation.duration = 600;
+    Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 10;
+    Chart.defaults.plugins.tooltip.displayColors = true;
+    Chart.defaults.plugins.tooltip.boxPadding = 4;
+    Chart.defaults.plugins.legend.labels.color = '#64748b';
+    Chart.defaults.plugins.legend.labels.font = { size: 11, weight: '500' };
+    Chart.defaults.scale.grid = { color: 'rgba(255,255,255,0.05)', drawBorder: false };
+    Chart.defaults.scale.ticks = { color: '#475569' };
+    Chart.defaults.animation.duration = 700;
     Chart.defaults.animation.easing = 'easeOutQuart';
 
     // Elements
