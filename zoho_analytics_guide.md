@@ -97,60 +97,21 @@
 
 ---
 
-## PHASE 3: Create Table Relationships (Lookup Columns)
+## PHASE 3: Create Table Relationships (Lookup Columns) — SKIP THIS PHASE
 
-### Step 8 — Link Enrolments → Candidates
-1. Open the **Enrolments** table.
-2. Click **"Add" → "Lookup Column"** in the toolbar.
-3. Configure:
-   - **Column Name**: `Candidate Profile`
-   - **Select Table**: `Candidates`
-   - **Column to Lookup**: `Candidate Id`
-   - **Match with column in Enrolments**: `CandidateId`
-4. Click **Save**.
+> [!IMPORTANT]
+> **You can skip this entire phase.** If Zoho gives you a **"Cyclic Relationship"** error when trying to add a Lookup Column, that's Zoho blocking the direction of the join — it's a known Zoho Analytics limitation.
+>
+> **Why it doesn't matter:** Every single report and chart in this dashboard is built from **SQL Query Tables** (Phase 4), which write the `JOIN` logic directly in SQL. Zoho's Lookup Column feature is only needed for its basic drag-and-drop auto-join — we are not using that at all.
+>
+> **Go straight to Phase 4.**
 
-### Step 9 — Link Applications → Candidates
-1. Open the **Applications** table.
-2. Click **"Add" → "Lookup Column"**.
-3. Configure:
-   - **Column Name**: `Candidate Profile`
-   - **Select Table**: `Candidates`
-   - **Column to Lookup**: `Candidate Id`
-   - **Match with column in Applications**: `Candidate Id`
-4. Click **Save**.
+### Why the Cyclic Error Happens (For Reference)
+Zoho Analytics prevents you from creating a Lookup Column if it detects that adding the relationship would form a loop between tables (A → B → A). Our 5 tables have a chain structure (`Enrolments → Candidates → Applications → Interviews`) and Zoho can sometimes misread this as cyclic depending on the order you import tables.
 
-### Step 10 — Link Applications → Job Openings
-1. Stay in the **Applications** table.
-2. Click **"Add" → "Lookup Column"** again.
-3. Configure:
-   - **Column Name**: `Job Opening Details`
-   - **Select Table**: `JobOpenings`
-   - **Column to Lookup**: `Job Opening Id`
-   - **Match with column in Applications**: `Job Opening Id`
-4. Click **Save**.
+Since all our charts use SQL Query Tables with explicit `LEFT JOIN` / `INNER JOIN` statements, Zoho's internal relationship graph is irrelevant — **the SQL handles everything directly**.
 
-### Step 11 — Link Interviews → Candidates
-1. Open the **Interviews** table.
-2. Click **"Add" → "Lookup Column"**.
-3. Configure:
-   - **Column Name**: `Candidate Profile`
-   - **Select Table**: `Candidates`
-   - **Column to Lookup**: `Candidate Id`
-   - **Match with column in Interviews**: `Candidate Id`
-4. Click **Save**.
-
-### Step 12 — Link Interviews → Job Openings
-1. Stay in the **Interviews** table.
-2. Click **"Add" → "Lookup Column"** again.
-3. Configure:
-   - **Column Name**: `Job Opening Details`
-   - **Select Table**: `JobOpenings`
-   - **Column to Lookup**: `Job Opening Id`
-   - **Match with column in Interviews**: `Job Opening Id`
-4. Click **Save**.
-
-> [!NOTE]
-> After Lookup Columns are set, Zoho auto-joins these tables when building reports — no manual SQL needed for basic charts.
+---
 
 ---
 
