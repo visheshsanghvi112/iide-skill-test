@@ -1,7 +1,30 @@
 # Zoho Analytics — Complete Step-by-Step Dashboard Guide
 ### Campus Placement Analytics (Question 2 Answer)
 
-This is the exact sequence of steps to replicate our placement analytics dashboard inside Zoho Analytics. Follow each phase in order. No steps are skipped.
+> All column names, stage values, and SQL queries in this guide are **verified directly against the raw CSV files**.
+
+---
+
+## Verified Column Reference (from actual CSVs)
+
+| Table | Key Columns |
+|:---|:---|
+| **Enrolments** | `Record Id`, `First Name`, `Last Name`, `Email`, `Batch Name`, `Stage`, `CandidateId`, `Knocked Off Reason`, `Preferred Job Type`, `Expected Salary` |
+| **Candidates** | `Candidate Id`, `First Name`, `Last Name`, `Phone Number`, `Email`, `City`, `Skill Set`, `Candidate Stage`, `Batch Name`, `Preferred Job Location` |
+| **Applications** | `Application Id`, `Candidate Id`, `Job Opening Id`, `Posting Title`, `Application Stage`, `Application Status`, `Batch Name` |
+| **Interviews** | `Interview Id`, `Candidate Id`, `Job Opening Id`, `Interview Type`, `Interview Status`, `Cancellation Reason`, `Batch Name` *(no Application Id)* |
+| **Job Openings** | `Job Opening Id`, `Posting Title`, `Job Opening Status`, `Job Type`, `City`, `Salary`, `Profile` |
+
+### Verified Distinct Values Used in SQL
+
+| Table | Column | Actual Values |
+|:---|:---|:---|
+| Enrolments | `Stage` | `Hired`, `Initiate Placement`, `Knocked Off`, `Not Eligible for Placement Outreach`, `On Hold`, `Outreach Initiated` |
+| Enrolments | `Knocked Off Reason` | `Dropout`, `Health / Personal Reason`, `Low Academic Course`, `No Response` |
+| Interviews | `Interview Status` | `Cancelled`, `Hired`, `Move to Next Round/Process`, `Needs More Mentoring`, `On-Hold`, `Rejected`, `Rescheduled` |
+| Interviews | `Cancellation Reason` | `Candidate no-show`, `Candidate not available`, `Job opening closed`, `Others` |
+| Job Openings | `Job Opening Status` | `In-progress`, `Filled`, `Cancelled`, `Declined`, `Inactive`, `On-Hold`, `Unverified` |
+| Candidates | `Preferred Job Location` | `On Site / Work from office`, `Remote` |
 
 ---
 
@@ -17,413 +40,394 @@ This is the exact sequence of steps to replicate our placement analytics dashboa
 2. Select **"New Workspace"**.
 3. Name it: `Campus Placement Analytics`
 4. Click **Create**.
-5. You are now inside your empty workspace. All your tables and dashboards will live here.
 
 ---
 
 ## PHASE 2: Import the 5 CSV Files
 
 > [!IMPORTANT]
-> You must import ALL 5 files below. The order matters because we'll link them together.
-> Your CSV files are located in your project folder:
-> `d:\iide-skill-test\Skill Test - Database-Applications - DUMP,...`
+> During import, Zoho will auto-detect numeric types. The ID columns are **18-digit numbers** that will be rounded/corrupted if stored as numbers. You MUST manually override them to **Plain Text**.
 
 ### Step 3 — Import Enrolments Table
-1. Inside your workspace, click **"Import Data"** (or click **Create → Import Data**).
-2. Choose **"From a File"** → **"CSV File"**.
-3. Upload: `Skill Test - Database-Enrolments.csv`
-4. In the **Column Type Configuration** screen that appears:
-   - Find `Record Id` → Change type to **Plain Text**
-   - Find `CandidateId` (or `Candidate Id`) → Change type to **Plain Text**
-5. Set the table name to: `Enrolments`
-6. Click **Import**.
+1. Inside your workspace, click **"Import Data"** → **"From a File"** → **"CSV File"**.
+2. Upload: `Skill Test - Database-Enrolments.csv`
+3. In the **Column Type Configuration** screen:
+   - `Record Id` → **Plain Text**
+   - `CandidateId` → **Plain Text**
+4. Set the table name to: `Enrolments`
+5. Click **Import**.
 
 ### Step 4 — Import Candidates Table
-1. Click **Import Data** again.
+1. Click **"Import Data"** → CSV.
 2. Upload: `Skill Test - Database-Candidates.csv`
-3. In Column Type Configuration:
-   - Find `Candidate Id` → Change type to **Plain Text**
-4. Set the table name to: `Candidates`
-5. Click **Import**.
+3. Column overrides:
+   - `Candidate Id` → **Plain Text**
+4. Table name: `Candidates` → Click **Import**.
 
 ### Step 5 — Import Job Openings Table
-1. Click **Import Data** again.
+1. Click **"Import Data"** → CSV.
 2. Upload: `Skill Test - Database-Job Openings.csv`
-3. In Column Type Configuration:
-   - Find `Job Opening Id` → Change type to **Plain Text**
-4. Set the table name to: `JobOpenings`
-5. Click **Import**.
+3. Column overrides:
+   - `Job Opening Id` → **Plain Text**
+   - `Account Manager Id` → **Plain Text**
+4. Table name: `JobOpenings` → Click **Import**.
 
 ### Step 6 — Import Applications Table
-1. Click **Import Data** again.
+1. Click **"Import Data"** → CSV.
 2. Upload: `Skill Test - Database-Applications.csv`
-3. In Column Type Configuration:
-   - Find `Application Id` → Change to **Plain Text**
-   - Find `Candidate Id` → Change to **Plain Text**
-   - Find `Job Opening Id` → Change to **Plain Text**
-4. Set the table name to: `Applications`
-5. Click **Import**.
+3. Column overrides:
+   - `Application Id` → **Plain Text**
+   - `Candidate Id` → **Plain Text**
+   - `Job Opening Id` → **Plain Text**
+4. Table name: `Applications` → Click **Import**.
 
 ### Step 7 — Import Interviews Table
-1. Click **Import Data** again.
+1. Click **"Import Data"** → CSV.
 2. Upload: `Skill Test - Database-Interviews.csv`
-3. In Column Type Configuration:
-   - Find `Interview Id` → Change to **Plain Text**
-   - Find `Candidate Id` → Change to **Plain Text**
-   - Find `Job Opening Id` → Change to **Plain Text**
-   - Find `Application Id` → Change to **Plain Text**
-4. Set the table name to: `Interviews`
-5. Click **Import**.
+3. Column overrides:
+   - `Interview Id` → **Plain Text**
+   - `Candidate Id` → **Plain Text**
+   - `Job Opening Id` → **Plain Text**
+   - `Client Id` → **Plain Text**
+   - `Interview Owner Id` → **Plain Text**
+4. Table name: `Interviews` → Click **Import**.
 
 > [!WARNING]
-> **CRITICAL — Why Plain Text?**
-> The ID columns in these files are 18-digit numbers (e.g. `159941000007258288`).
-> If Zoho treats them as numbers, it rounds them to `159941000007258270`, which BREAKS all the joins.
-> Setting them to **Plain Text** fixes this completely.
+> The **Interviews** table has **NO `Application Id` column**. It links to candidates via `Candidate Id` and to jobs via `Job Opening Id` directly.
 
 ---
 
 ## PHASE 3: Create Table Relationships (Lookup Columns)
 
-This step tells Zoho Analytics how the tables are connected to each other — exactly like our relational schema.
-
 ### Step 8 — Link Enrolments → Candidates
-1. Open the **Enrolments** table (click it from the workspace).
-2. In the toolbar at the top, click **"Add" → "Lookup Column"**.
-3. In the dialog that opens:
-   - **Column Name**: `Candidate Name Lookup`
+1. Open the **Enrolments** table.
+2. Click **"Add" → "Lookup Column"** in the toolbar.
+3. Configure:
+   - **Column Name**: `Candidate Profile`
    - **Select Table**: `Candidates`
-   - **Lookup Column**: `Candidate Id`
-   - **Referenced Column in Enrolments**: `CandidateId`
+   - **Column to Lookup**: `Candidate Id`
+   - **Match with column in Enrolments**: `CandidateId`
 4. Click **Save**.
 
-### Step 9 — Link Candidates → Applications
+### Step 9 — Link Applications → Candidates
 1. Open the **Applications** table.
 2. Click **"Add" → "Lookup Column"**.
-3. In the dialog:
-   - **Column Name**: `Candidate Lookup`
+3. Configure:
+   - **Column Name**: `Candidate Profile`
    - **Select Table**: `Candidates`
-   - **Lookup Column**: `Candidate Id`
-   - **Referenced Column in Applications**: `Candidate Id`
+   - **Column to Lookup**: `Candidate Id`
+   - **Match with column in Applications**: `Candidate Id`
 4. Click **Save**.
 
-### Step 10 — Link JobOpenings → Applications
+### Step 10 — Link Applications → Job Openings
 1. Stay in the **Applications** table.
 2. Click **"Add" → "Lookup Column"** again.
-3. In the dialog:
-   - **Column Name**: `Job Opening Lookup`
+3. Configure:
+   - **Column Name**: `Job Opening Details`
    - **Select Table**: `JobOpenings`
-   - **Lookup Column**: `Job Opening Id`
-   - **Referenced Column in Applications**: `Job Opening Id`
+   - **Column to Lookup**: `Job Opening Id`
+   - **Match with column in Applications**: `Job Opening Id`
 4. Click **Save**.
 
-### Step 11 — Link Applications → Interviews
+### Step 11 — Link Interviews → Candidates
 1. Open the **Interviews** table.
 2. Click **"Add" → "Lookup Column"**.
-3. In the dialog:
-   - **Column Name**: `Application Lookup`
-   - **Select Table**: `Applications`
-   - **Lookup Column**: `Application Id`
-   - **Referenced Column in Interviews**: `Application Id`
+3. Configure:
+   - **Column Name**: `Candidate Profile`
+   - **Select Table**: `Candidates`
+   - **Column to Lookup**: `Candidate Id`
+   - **Match with column in Interviews**: `Candidate Id`
+4. Click **Save**.
+
+### Step 12 — Link Interviews → Job Openings
+1. Stay in the **Interviews** table.
+2. Click **"Add" → "Lookup Column"** again.
+3. Configure:
+   - **Column Name**: `Job Opening Details`
+   - **Select Table**: `JobOpenings`
+   - **Column to Lookup**: `Job Opening Id`
+   - **Match with column in Interviews**: `Job Opening Id`
 4. Click **Save**.
 
 > [!NOTE]
-> After setting up Lookup Columns, Zoho Analytics will **auto-join** these tables whenever you build a report — you won't need to write JOINs manually for basic charts.
+> After Lookup Columns are set, Zoho auto-joins these tables when building reports — no manual SQL needed for basic charts.
 
 ---
 
-## PHASE 4: Create SQL Query Tables (For Complex Analytics)
+## PHASE 4: Create SQL Query Tables
 
-Some of our charts need custom calculations. For these we use **Query Tables**.
-
-### Step 12 — Create the Funnel Stats Query Table
-1. In your workspace, click **"Create" → "Query Table"**.
-2. A SQL editor opens. Paste this SQL:
-
-```sql
-SELECT 
-    (SELECT COUNT(*) FROM "Enrolments") as "Registered",
-    (SELECT COUNT(*) FROM "Candidates") as "Eligible",
-    (SELECT COUNT(*) FROM "Applications") as "Applied",
-    (SELECT COUNT(DISTINCT "Application Id") FROM "Interviews") as "Interviewed",
-    (SELECT COUNT(*) FROM "Enrolments" WHERE "Stage" = 'Hired') as "Placed"
-```
-
-3. Click **"Execute Query"** — verify you see 5 columns with numbers.
-4. Click **Save** and name it: `Funnel Stats`
-
-### Step 13 — Create the Batch Performance Query Table
-1. Click **"Create" → "Query Table"** again.
+### Step 13 — Funnel Stats (5 headline KPI numbers)
+1. Click **"Create" → "Query Table"** in your workspace.
 2. Paste this SQL:
 
 ```sql
 SELECT 
-    e."Batch Name",
-    COUNT(*) as "Registered",
-    SUM(CASE WHEN e."Stage" = 'Placement Eligible' OR e."Stage" = 'Hired' THEN 1 ELSE 0 END) as "Eligible",
-    SUM(CASE WHEN e."Stage" = 'Hired' THEN 1 ELSE 0 END) as "Hired",
-    ROUND(100.0 * SUM(CASE WHEN e."Stage" = 'Hired' THEN 1 ELSE 0 END) / COUNT(*), 1) as "PlacedPercent"
-FROM "Enrolments" e
-GROUP BY e."Batch Name"
+    (SELECT COUNT(*) FROM "Enrolments") AS "Registered",
+    (SELECT COUNT(*) FROM "Candidates") AS "Eligible",
+    (SELECT COUNT(*) FROM "Applications") AS "Applied",
+    (SELECT COUNT("Interview Id") FROM "Interviews") AS "Interviewed",
+    (SELECT COUNT(*) FROM "Enrolments" WHERE "Stage" = 'Hired') AS "Placed"
+```
+
+3. Click **Execute Query** — you should see 1 row with 5 numbers.
+4. Save as: `Funnel Stats`
+
+### Step 14 — Batch Performance (hired rate per training batch)
+1. Click **"Create" → "Query Table"**.
+2. Paste:
+
+```sql
+SELECT 
+    "Batch Name",
+    COUNT(*) AS "Registered",
+    SUM(CASE WHEN "Stage" IN ('Initiate Placement', 'Outreach Initiated', 'Hired') THEN 1 ELSE 0 END) AS "Eligible",
+    SUM(CASE WHEN "Stage" = 'Hired' THEN 1 ELSE 0 END) AS "Hired"
+FROM "Enrolments"
+GROUP BY "Batch Name"
 ORDER BY "Hired" DESC
 ```
 
-3. Click **Execute Query**, verify it returns batch-wise rows.
-4. Save as: `Batch Performance`
+3. Execute, verify rows show batch names. Save as: `Batch Performance`
 
-### Step 14 — Create the Interview Cancellations Query Table
+### Step 15 — Interview Cancellations (why rounds are cancelled)
 1. Click **"Create" → "Query Table"**.
-2. Paste this SQL:
+2. Paste:
 
 ```sql
 SELECT 
     "Cancellation Reason",
-    COUNT("Interview Id") as "CancelledCount"
+    COUNT("Interview Id") AS "CancelledCount"
 FROM "Interviews"
-WHERE "Interview Status" = 'Cancelled' 
+WHERE "Interview Status" = 'Cancelled'
   AND "Cancellation Reason" IS NOT NULL
   AND "Cancellation Reason" != ''
 GROUP BY "Cancellation Reason"
 ORDER BY "CancelledCount" DESC
 ```
 
-3. Execute, verify, and Save as: `Cancellation Reasons`
+3. Execute — expect 4 rows: `Candidate no-show`, `Candidate not available`, `Job opening closed`, `Others`.
+4. Save as: `Cancellation Reasons`
 
-### Step 15 — Create the Recruiter Discrepancy Audit Query Table
-1. Click **"Create" → "Query Table"**.
-2. Paste this SQL:
-
-```sql
-SELECT 
-    e."First Name" || ' ' || e."Last Name" as "Student Name",
-    e."Stage" as "Enrolment Stage",
-    COUNT(a."Application Id") as "Applications Count",
-    COUNT(i."Interview Id") as "Interviews Count"
-FROM "Enrolments" e
-LEFT JOIN "Candidates" c ON e."CandidateId" = c."Candidate Id"
-LEFT JOIN "Applications" a ON c."Candidate Id" = a."Candidate Id"
-LEFT JOIN "Interviews" i ON a."Application Id" = i."Application Id"
-WHERE e."Stage" = 'Hired'
-GROUP BY "Student Name", "Enrolment Stage"
-HAVING COUNT(a."Application Id") = 0 OR COUNT(i."Interview Id") = 0
-```
-
-3. Execute, verify (should show 5 students like Naomi Bennett, Eva Hughes, Madison Young).
-4. Save as: `Discrepancy Audit`
-
-### Step 16 — Create the Knock-off Reasons Query Table
+### Step 16 — Knock-off Reasons (why students are removed)
 1. Click **"Create" → "Query Table"**.
 2. Paste:
 
 ```sql
 SELECT 
     "Knocked Off Reason",
-    COUNT("Record Id") as "Count"
+    COUNT("Record Id") AS "Count"
 FROM "Enrolments"
-WHERE "Knocked Off Reason" IS NOT NULL 
+WHERE "Stage" = 'Knocked Off'
+  AND "Knocked Off Reason" IS NOT NULL
   AND "Knocked Off Reason" != ''
 GROUP BY "Knocked Off Reason"
 ORDER BY "Count" DESC
 ```
 
-3. Execute, verify, Save as: `Knockoff Reasons`
+3. Execute — expect 4 reasons: `No Response`, `Dropout`, `Health / Personal Reason`, `Low Academic Course`.
+4. Save as: `Knockoff Reasons`
 
-### Step 17 — Create the Top Skills Query Table
+### Step 17 — Top Skills (from eligible candidates)
 1. Click **"Create" → "Query Table"**.
 2. Paste:
 
 ```sql
 SELECT 
-    "Skill Set" as "Skill",
-    COUNT("Candidate Id") as "Count"
+    "Skill Set" AS "Skill",
+    COUNT("Candidate Id") AS "Count"
 FROM "Candidates"
-WHERE "Skill Set" IS NOT NULL AND "Skill Set" != ''
+WHERE "Skill Set" IS NOT NULL
+  AND "Skill Set" != ''
 GROUP BY "Skill Set"
 ORDER BY "Count" DESC
-LIMIT 10
 ```
 
-3. Execute, verify, Save as: `Top Skills`
+3. Execute, verify results. Save as: `Top Skills`
+
+### Step 18 — Recruiter Discrepancy Audit
+*(Hired in Enrolments but no matching applications/interviews)*
+1. Click **"Create" → "Query Table"**.
+2. Paste:
+
+```sql
+SELECT 
+    e."First Name" || ' ' || e."Last Name" AS "Student Name",
+    e."Stage" AS "Enrolment Stage",
+    COUNT(DISTINCT a."Application Id") AS "Applications Count",
+    COUNT(DISTINCT i."Interview Id") AS "Interviews Count"
+FROM "Enrolments" e
+LEFT JOIN "Candidates" c ON e."CandidateId" = c."Candidate Id"
+LEFT JOIN "Applications" a ON c."Candidate Id" = a."Candidate Id"
+LEFT JOIN "Interviews" i ON c."Candidate Id" = i."Candidate Id"
+WHERE e."Stage" = 'Hired'
+GROUP BY "Student Name", "Enrolment Stage"
+HAVING COUNT(DISTINCT a."Application Id") = 0
+    OR COUNT(DISTINCT i."Interview Id") = 0
+```
+
+3. Execute — should return 5 students (Naomi Bennett, Eva Hughes, Madison Young, Henry Gonzalez, Abigail Sanchez).
+4. Save as: `Discrepancy Audit`
 
 ---
 
 ## PHASE 5: Build Individual Charts (Reports)
 
-Each chart below is built as a **Report** first. You'll then drag them all onto the Dashboard in Phase 6.
+> Build each chart separately, save it, then add it to the dashboard in Phase 7.
 
-### Step 18 — Funnel Bar Chart (Placement Ingestion)
+### Step 19 — Funnel Bar Chart
 1. Open the **Funnel Stats** query table.
-2. Click **"Create" → "Chart View"** in the top toolbar.
-3. In the **Chart Designer**:
-   - This table has 5 columns (`Registered`, `Eligible`, `Applied`, `Interviewed`, `Placed`).
-   - Since this is aggregated data (single row), you'll display it as a bar chart manually.
-   - Drag each column value to the Y-Axis (you may need to create a **Pivot Table** or use multiple series).
-   - **Alternative approach**: Change chart type to **Bar Chart**, select all 5 columns as Y-Axis series.
-4. Change chart type to **"Bar Chart"** using the chart icons in the top-right toolbar.
-5. Customize colors to match each stage (blue → cyan → green → orange → red).
-6. Click **Save**, name it: `Placement Funnel Chart`
+2. Click **"Create" → "Chart View"**.
+3. In Chart Designer — this table is a single row with 5 columns. To plot it as a bar chart:
+   - Switch chart type to **"Bar Chart"**
+   - Add all 5 columns (`Registered`, `Eligible`, `Applied`, `Interviewed`, `Placed`) as separate **Y-Axis** series with a manual X-axis label per series.
+4. Save as: `Placement Funnel Chart`
 
-### Step 19 — Batch Performance Grouped Bar Chart
+### Step 20 — Batch Grouped Bar Chart
 1. Open the **Batch Performance** query table.
 2. Click **"Create" → "Chart View"**.
-3. In Chart Designer:
-   - **X-Axis**: Drag `Batch Name`
-   - **Y-Axis**: Drag `Registered`, `Eligible`, `Hired` (3 series = grouped bars)
-4. Change chart type to **"Grouped Bar Chart"**.
-5. Click **Save**, name it: `Batch Performance Chart`
+3. Chart Designer:
+   - **X-Axis**: `Batch Name`
+   - **Y-Axis**: Drag `Registered`, `Eligible`, `Hired` (3 separate series)
+4. Change type to **Grouped Bar Chart**.
+5. Save as: `Batch Performance Chart`
 
-### Step 20 — Doughnut Chart: Knock-off Reasons
+### Step 21 — Doughnut: Knock-off Reasons
 1. Open the **Knockoff Reasons** query table.
 2. Click **"Create" → "Chart View"**.
-3. In Chart Designer:
-   - **Color (Legend)**: Drag `Knocked Off Reason`
-   - **Y-Axis**: Drag `Count`
-4. Change chart type to **"Pie Chart"** then switch to **"Ring/Doughnut"** using the chart type toolbar.
-5. Click **Save**, name it: `Dropout Reasons Chart`
+3. Chart Designer:
+   - **Color/Slice**: `Knocked Off Reason`
+   - **Y-Axis**: `Count`
+4. Change type to **Pie** → switch to **Ring** in the toolbar.
+5. Save as: `Dropout Reasons Chart`
 
-### Step 21 — Horizontal Bar Chart: Cancellation Reasons
+### Step 22 — Horizontal Bar: Cancellation Reasons
 1. Open the **Cancellation Reasons** query table.
 2. Click **"Create" → "Chart View"**.
-3. In Chart Designer:
-   - **X-Axis**: Drag `Cancellation Reason`
-   - **Y-Axis**: Drag `CancelledCount`
-4. Change chart type to **"Bar Chart"** and then flip to horizontal by clicking the **"Switch Axes"** button.
-5. Click **Save**, name it: `Cancellation Reasons Chart`
+3. Chart Designer:
+   - **X-Axis**: `Cancellation Reason`
+   - **Y-Axis**: `CancelledCount`
+4. Change type to **Bar**, then click **Switch Axes** to make it horizontal.
+5. Save as: `Cancellation Reasons Chart`
 
-### Step 22 — Bar Chart: Top Candidate Skills
+### Step 23 — Horizontal Bar: Top Skills
 1. Open the **Top Skills** query table.
 2. Click **"Create" → "Chart View"**.
-3. In Chart Designer:
-   - **X-Axis**: Drag `Skill`
-   - **Y-Axis**: Drag `Count`
-4. Change chart type to **"Bar Chart"** (horizontal).
-5. Click **Save**, name it: `Top Skills Chart`
+3. Chart Designer:
+   - **X-Axis**: `Skill`
+   - **Y-Axis**: `Count`
+4. Change type to horizontal **Bar Chart**.
+5. Save as: `Top Skills Chart`
 
-### Step 23 — Pie Chart: Preferred Job Location
+### Step 24 — Pie: Preferred Job Location
 1. Open the **Candidates** table directly.
 2. Click **"Create" → "Chart View"**.
-3. In Chart Designer:
-   - **Color (Legend)**: Drag `Preferred Job Location`
-   - **Y-Axis**: Drag `Candidate Id` → set Aggregate to **Count**
-4. Change chart type to **"Pie Chart"**.
-5. Click **Save**, name it: `Location Preference Chart`
+3. Chart Designer:
+   - **Color/Slice**: `Preferred Job Location`
+   - **Y-Axis**: `Candidate Id` → Aggregate: **Count**
+4. Change type to **Pie Chart**.
+5. Save as: `Location Preference Chart`
 
-### Step 24 — Table View: Recruiter Discrepancy Audit
+> Expected slices: `On Site / Work from office` and `Remote`
+
+### Step 25 — Table View: Discrepancy Audit
 1. Open the **Discrepancy Audit** query table.
-2. Click **"Create" → "Table / Pivot View"**.
-3. Select **"Table View"**.
-4. In the column selector:
-   - Drag in: `Student Name`, `Enrolment Stage`, `Applications Count`, `Interviews Count`
-5. Click **Save**, name it: `Discrepancy Audit Table`
+2. Click **"Create" → "Pivot / Table View"** → select **Table View**.
+3. Drag in columns: `Student Name`, `Enrolment Stage`, `Applications Count`, `Interviews Count`.
+4. Save as: `Discrepancy Audit Table`
 
 ---
 
 ## PHASE 6: Build the KPI Widgets
 
-KPI widgets show big single-number metrics at the top of your dashboard.
+### Step 26 — Create the Dashboard first
+1. Click **"Create" → "Dashboard"**.
+2. Name it: `Placement Executive Dashboard`.
+3. You are now in the drag-and-drop dashboard builder.
 
-### Step 25 — Total Registered KPI
-1. Go to your workspace home.
-2. Click **"Create" → "Dashboard"** (or open your dashboard if you already created one).
-3. In the Dashboard editor, click **"Widget"** in the top toolbar.
-4. Select **"KPI Widget"** → **"Single Number"**.
-5. In the Widget Editor:
+### Step 27 — Total Enrolments KPI
+1. In the dashboard editor, click **"Widget"** in the toolbar.
+2. Select **"KPI Widget"** → **"Single Number"**.
+3. Configure:
    - **Base Table**: `Funnel Stats`
-   - **Data Column**: `Registered`
-   - **Aggregate**: Sum
+   - **Data Column**: `Registered` | **Aggregate**: Sum
    - **Label**: `Total Enrolments`
-6. Click **Apply**.
+4. Click **Apply**.
 
-### Step 26 — Placement Eligible KPI
+### Step 28 — Placement Eligible KPI
 1. Click **"Widget"** → **"KPI Widget"** → **"Single Number"**.
-2. In the Widget Editor:
-   - **Base Table**: `Funnel Stats`
-   - **Data Column**: `Eligible`
-   - **Aggregate**: Sum
+2. Configure:
+   - **Base Table**: `Funnel Stats` | **Column**: `Eligible` | **Aggregate**: Sum
    - **Label**: `Placement Eligible`
 3. Click **Apply**.
 
-### Step 27 — Placed / Hired KPI
+### Step 29 — Hired & Placed KPI
 1. Click **"Widget"** → **"KPI Widget"** → **"Single Number"**.
-2. In the Widget Editor:
-   - **Base Table**: `Funnel Stats`
-   - **Data Column**: `Placed`
-   - **Aggregate**: Sum
+2. Configure:
+   - **Base Table**: `Funnel Stats` | **Column**: `Placed` | **Aggregate**: Sum
    - **Label**: `Hired & Placed`
 3. Click **Apply**.
 
-### Step 28 — Total Job Openings KPI
+### Step 30 — Total Job Openings KPI
 1. Click **"Widget"** → **"KPI Widget"** → **"Single Number"**.
-2. In the Widget Editor:
-   - **Base Table**: `JobOpenings`
-   - **Data Column**: `Job Opening Id`
-   - **Aggregate**: Count
+2. Configure:
+   - **Base Table**: `JobOpenings` | **Column**: `Job Opening Id` | **Aggregate**: Count
    - **Label**: `Total Job Openings`
 3. Click **Apply**.
 
 ---
 
-## PHASE 7: Assemble the Dashboard
+## PHASE 7: Assemble the Dashboard Layout
 
-### Step 29 — Create the Dashboard Canvas
-1. In your workspace, click **"Create" → "Dashboard"**.
-2. Name it: `Placement Executive Dashboard`
-3. You are now in the drag-and-drop dashboard builder.
+### Step 31 — Arrange the Layout
+In the left **Reports** panel, drag each saved chart onto the canvas:
 
-### Step 30 — Add KPI Widgets (Top Row)
-1. Your 4 KPI widgets from Phase 6 should appear in the left **Widgets** panel.
-2. **Drag each KPI widget** onto the top row of the canvas.
-3. Resize them so all 4 sit side by side in a single row (drag the edges to resize).
+**Row 1 — KPI strip (4 widgets side by side):**
+- `Total Enrolments` | `Placement Eligible` | `Hired & Placed` | `Total Job Openings`
 
-### Step 31 — Add Charts (Main Body)
-In the left panel, look for the **"Reports"** tab — all saved charts from Phase 5 appear here:
+**Row 2 — two columns:**
+- Left (2/3 width): `Placement Funnel Chart`
+- Right (1/3 width): `Dropout Reasons Chart`
 
-**Row 2 (two-column layout):**
-- Drag `Placement Funnel Chart` → Place it as a wide 2/3-width card on the left.
-- Drag `Dropout Reasons Chart` → Place it as 1/3-width card on the right.
+**Row 3 — two columns:**
+- Left (2/3 width): `Batch Performance Chart`
+- Right (1/3 width): `Cancellation Reasons Chart`
 
-**Row 3 (two-column layout):**
-- Drag `Batch Performance Chart` → Wide 2/3-width card left.
-- Drag `Cancellation Reasons Chart` → 1/3-width card right.
+**Row 4 — three columns:**
+- `Top Skills Chart` | `Location Preference Chart` | *(leave blank or add a top roles chart)*
 
-**Row 4 (three-column layout):**
-- Drag `Top Skills Chart`
-- Drag `Location Preference Chart`
-- Drag `Top Job Postings Chart` *(if you built one from JobOpenings)*
+**Row 5 — full width:**
+- `Discrepancy Audit Table`
 
-**Row 5 (full width):**
-- Drag `Discrepancy Audit Table` → Full-width card spanning the whole row.
-
-### Step 32 — Final Polish & Save
-1. Click on any chart to **rename** it — add proper title text.
-2. Use the **Theme** option in the dashboard settings to pick a light/corporate color theme.
-3. Click the **"Filters"** button to add a global **Batch Name filter** so viewers can slice by batch.
-4. Click **"Save"** (top-right corner).
-5. Click **"Publish"** or **"Share"** to generate a shareable link if needed.
+### Step 32 — Polish & Save
+1. Click any chart title to rename it.
+2. Click **"Theme"** in dashboard settings → pick a light corporate palette.
+3. Add a **Global Filter** on `Batch Name` (works across all charts).
+4. Click **Save** → **Publish** to generate a shareable link.
 
 ---
 
-## Quick Reference: What Each Report Answers
+## Quick Reference: All Reports
 
-| Report Name | Source Table | Answers |
-|:---|:---|:---|
-| `Placement Funnel Chart` | Funnel Stats | How many students drop off at each stage? |
-| `Batch Performance Chart` | Batch Performance | Which batches produced the most placements? |
-| `Dropout Reasons Chart` | Knockoff Reasons | Why do students get knocked off the program? |
-| `Cancellation Reasons Chart` | Cancellation Reasons | Why do interview rounds get cancelled? |
-| `Top Skills Chart` | Top Skills | What skills do eligible candidates have? |
-| `Location Preference Chart` | Candidates | Where do candidates prefer to work? |
-| `Discrepancy Audit Table` | Discrepancy Audit | Which "Hired" students have no application trail? |
-| KPI Widgets x4 | Funnel Stats, JobOpenings | High-level headline numbers |
+| Report | Source | Visualisation | What It Shows |
+|:---|:---|:---|:---|
+| Placement Funnel Chart | Funnel Stats | Bar | Dropout at each stage |
+| Batch Performance Chart | Batch Performance | Grouped Bar | Registered vs Eligible vs Hired per batch |
+| Dropout Reasons Chart | Knockoff Reasons | Doughnut | Why students are knocked off |
+| Cancellation Reasons Chart | Cancellation Reasons | Horizontal Bar | Why interview rounds cancel |
+| Top Skills Chart | Top Skills | Horizontal Bar | Most common candidate skills |
+| Location Preference Chart | Candidates | Pie | On-site vs Remote preference |
+| Discrepancy Audit Table | Discrepancy Audit | Table | Hired students with no application trail |
+| KPI Widgets ×4 | Funnel Stats + JobOpenings | Number | Headline metrics |
 
 ---
 
-## Common Troubleshooting
+## Troubleshooting
 
 | Problem | Fix |
 |:---|:---|
-| IDs are showing as scientific notation (e.g. `1.6e+17`) | Go back to the table → Edit Column → Change type to **Plain Text** |
-| SQL Query Table throws an error | Check exact column names by opening the raw table first — Zoho is case-sensitive |
-| Chart shows no data | Make sure Lookup Columns are correctly set up (Phase 3) |
-| Dashboard charts are too small | Drag the edges of each chart card to resize them in the dashboard editor |
-| Lookup column not working | Verify both ID columns are **Plain Text** type on both sides of the relationship |
+| IDs show as `1.6e+17` | Edit Column → change type to **Plain Text** |
+| SQL throws "column not found" | Column names are case-sensitive — copy exact names from the reference table at the top of this guide |
+| Knockoff Reasons query returns 0 rows | Make sure the `WHERE` clause uses `'Knocked Off'` exactly (verified stage value) |
+| Interviews join returns wrong data | Interviews links via `Candidate Id` and `Job Opening Id` — there is **no** `Application Id` in that table |
+| Lookup column gives no matches | Confirm both sides are **Plain Text** type — a Text vs Number mismatch silently produces 0 matches |
+| Dashboard charts too small | Drag the corner handles to resize in the dashboard editor |
