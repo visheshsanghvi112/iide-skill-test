@@ -27,88 +27,129 @@ def js():
 def get_dashboard_stats():
     conn = get_db_connection()
     cursor = conn.cursor()
-    
+
     # 1. Funnel Stats
-    # Registered -> Eligible -> Applied -> Interviewed -> Placed
     cursor.execute("SELECT COUNT(*) FROM enrolments;")
     total_registered = cursor.fetchone()[0]
-    
+
     cursor.execute("SELECT COUNT(*) FROM candidates;")
     total_eligible = cursor.fetchone()[0]
-    
+
     cursor.execute("SELECT COUNT(DISTINCT candidate_id) FROM applications;")
     total_applied = cursor.fetchone()[0]
-    
+
     cursor.execute("SELECT COUNT(DISTINCT a.candidate_id) FROM interviews i JOIN applications a ON i.application_id = a.application_id;")
     total_interviewed = cursor.fetchone()[0]
-    
+
     cursor.execute("SELECT COUNT(*) FROM enrolments WHERE stage = 'Hired';")
     total_placed = cursor.fetchone()[0]
-    
-    # 2. Candidate Placement Discrepancies
-    # Hired in Enrolments but no Hired application or zero applications
+
+    # 2. Job Openings — Active vs Total (audit: only 3.7% are active)
+    cursor.execute("SELECT COUNT(*) FROM job_openings;")
+    total_jobs = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM job_openings WHERE job_opening_status = 'In-progress';")
+    active_jobs = cursor.fetchone()[0]
+
+    # 3. Discrepancy Audit — Hired with missing recruiter workflow
     cursor.execute("""
-        SELECT enrolment_id, first_name || ' ' || last_name as name, candidate_id, stage
-        FROM enrolments 
-        WHERE stage = 'Hired' AND candidate_id NOT IN (
-            SELECT candidate_id FROM applications WHERE application_status = 'Hired' OR application_stage = 'Hired'
-        );
+        SELECT e.first_name || ' ' || e.last_name as name,
+               e.candidate_id,
+               e.stage,
+               COUNT(DISTINCT a.application_id) as app_count,
+               COUNT(DISTINCT i.interview_id) as interview_count
+        FROM enrolments e
+        LEFT JOIN candidates c ON e.candidate_id = c.candidate_id
+        LEFT JOIN applications a ON c.candidate_id = a.candidate_id
+        LEFT JOIN interviews i ON i.application_id = a.application_id
+        WHERE e.stage = 'Hired'
+        GROUP BY e.candidate_id, name, e.stage
+        HAVING COUNT(DISTINCT a.application_id) = 0 OR COUNT(DISTINCT i.interview_id) = 0
+        ORDER BY app_count ASC;
     """)
     discrepancies = [dict(row) for row in cursor.fetchall()]
-    
-    # 3. Knocked Off / Dropout Reasons
+
+    # 4. Data Quality Alerts (from audit findings)
+    cursor.execute("SELECT COUNT(*) FROM interviews WHERE interview_status IS NULL;")
+    null_interview_status = cursor.fetchone()[0]
+
     cursor.execute("""
-        SELECT knocked_off_reason, COUNT(*) as count 
-        FROM enrolments 
+        SELECT COUNT(*) FROM enrolments e
+        JOIN candidates c ON e.candidate_id = c.candidate_id
+        WHERE e.stage = 'Hired' AND c.candidate_stage != 'Hired';
+    """)
+    stage_mismatch_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM enrolments WHERE stage = 'Knocked Off' AND knocked_off_reason IS NULL;")
+    ko_no_reason = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM candidates WHERE preferred_job_location IS NULL;")
+    null_location = cursor.fetchone()[0]
+
+    # 5. Neglected Candidates — many apps, zero interviews
+    cursor.execute("""
+        SELECT c.first_name || ' ' || c.last_name as name,
+               COUNT(DISTINCT a.application_id) as app_count,
+               COUNT(DISTINCT i.interview_id) as interview_count
+        FROM candidates c
+        JOIN applications a ON c.candidate_id = a.candidate_id
+        LEFT JOIN interviews i ON i.application_id = a.application_id
+        WHERE i.interview_id IS NULL
+        GROUP BY c.candidate_id
+        ORDER BY app_count DESC
+        LIMIT 6;
+    """)
+    neglected_candidates = [dict(row) for row in cursor.fetchall()]
+
+    # 6. Knock-off Reasons
+    cursor.execute("""
+        SELECT knocked_off_reason, COUNT(*) as count
+        FROM enrolments
         WHERE knocked_off_reason IS NOT NULL AND knocked_off_reason != ''
-        GROUP BY knocked_off_reason 
+        GROUP BY knocked_off_reason
         ORDER BY count DESC;
     """)
     knock_off_reasons = [dict(row) for row in cursor.fetchall()]
-    
-    # 4. Interview Cancellations
+
+    # 7. Interview Cancellations
     cursor.execute("""
-        SELECT cancellation_reason, COUNT(*) as count 
-        FROM interviews 
+        SELECT cancellation_reason, COUNT(*) as count
+        FROM interviews
         WHERE cancellation_reason IS NOT NULL AND cancellation_reason != ''
-        GROUP BY cancellation_reason 
+        GROUP BY cancellation_reason
         ORDER BY count DESC;
     """)
     interview_cancellations = [dict(row) for row in cursor.fetchall()]
-    
-    # 5. Job Openings Status
+
+    # 8. Job Opening Status breakdown
     cursor.execute("""
-        SELECT COALESCE(job_opening_status, 'Unspecified') as status, COUNT(*) as count 
-        FROM job_openings 
-        GROUP BY status 
+        SELECT COALESCE(job_opening_status, 'Unspecified') as status, COUNT(*) as count
+        FROM job_openings
+        GROUP BY status
         ORDER BY count DESC;
     """)
     job_statuses = [dict(row) for row in cursor.fetchall()]
-    
-    # 6. Demographics
-    cursor.execute("SELECT gender, COUNT(*) as count FROM candidates GROUP BY gender;")
-    gender_dist = [dict(row) for row in cursor.fetchall()]
-    
+
+    # 9. Location preference distribution
     cursor.execute("""
-        SELECT COALESCE(preferred_job_location, 'Not Specified') as location, COUNT(*) as count 
-        FROM candidates 
-        GROUP BY location 
+        SELECT COALESCE(preferred_job_location, 'Not Specified') as location, COUNT(*) as count
+        FROM candidates
+        GROUP BY location
         ORDER BY count DESC;
     """)
     location_dist = [dict(row) for row in cursor.fetchall()]
-    
-    # 7. Skill Word Cloud Ingestion
+
+    # 10. Skill counts (split comma-separated blob in Python)
     cursor.execute("SELECT skill_set FROM candidates WHERE skill_set IS NOT NULL;")
     skills_data = cursor.fetchall()
     all_skills = []
     for row in skills_data:
         skills_list = [s.strip() for s in row[0].split(',') if s.strip()]
         all_skills.extend(skills_list)
-    skill_counts = [{"skill": k, "count": v} for k, v in Counter(all_skills).most_common(20)]
-    
-    # 8. Batch Performance Metrics
+    skill_counts = [{"skill": k, "count": v} for k, v in Counter(all_skills).most_common(12)]
+
+    # 11. Batch Performance
     cursor.execute("""
-        SELECT 
+        SELECT
             batch_name,
             COUNT(*) as registered,
             SUM(CASE WHEN candidate_id IS NOT NULL THEN 1 ELSE 0 END) as eligible,
@@ -119,28 +160,28 @@ def get_dashboard_stats():
     """)
     batch_performance = [dict(row) for row in cursor.fetchall()]
 
-    # 9. Top Job Roles Posting Titles
+    # 12. Top Active Job Roles (active only — total is inflated by duplicates)
     cursor.execute("""
-        SELECT COALESCE(posting_title, 'Not Specified') as role, COUNT(*) as count 
-        FROM job_openings 
-        GROUP BY role 
-        ORDER BY count DESC 
-        LIMIT 10;
+        SELECT COALESCE(posting_title, 'Not Specified') as role, COUNT(*) as count
+        FROM job_openings
+        WHERE job_opening_status = 'In-progress'
+        GROUP BY role
+        ORDER BY count DESC
+        LIMIT 8;
     """)
     top_roles = [dict(row) for row in cursor.fetchall()]
-    
-    # 10. Active Account Managers (Top Job Providers)
+
+    # 13. Interview Status Breakdown
     cursor.execute("""
-        SELECT account_manager_id, COUNT(*) as count 
-        FROM job_openings 
-        GROUP BY account_manager_id 
-        ORDER BY count DESC 
-        LIMIT 10;
+        SELECT COALESCE(interview_status, 'No Status Recorded') as status, COUNT(*) as count
+        FROM interviews
+        GROUP BY interview_status
+        ORDER BY count DESC;
     """)
-    top_account_managers = [dict(row) for row in cursor.fetchall()]
+    interview_statuses = [dict(row) for row in cursor.fetchall()]
 
     conn.close()
-    
+
     return jsonify({
         "funnel": {
             "registered": total_registered,
@@ -149,38 +190,46 @@ def get_dashboard_stats():
             "interviewed": total_interviewed,
             "placed": total_placed
         },
+        "jobs": {
+            "total": total_jobs,
+            "active": active_jobs
+        },
+        "data_quality": {
+            "null_interview_status": null_interview_status,
+            "stage_mismatch_count": stage_mismatch_count,
+            "ko_no_reason": ko_no_reason,
+            "null_location": null_location
+        },
         "discrepancies": discrepancies,
+        "neglected_candidates": neglected_candidates,
         "knock_off_reasons": knock_off_reasons,
         "interview_cancellations": interview_cancellations,
         "job_statuses": job_statuses,
-        "gender_dist": gender_dist,
         "location_dist": location_dist,
         "skill_counts": skill_counts,
         "batch_performance": batch_performance,
         "top_roles": top_roles,
-        "top_account_managers": top_account_managers
+        "interview_statuses": interview_statuses
     })
 
 @app.route('/api/query', methods=['POST'])
 def run_query():
     data = request.json
     query = data.get('query', '').strip()
-    
+
     if not query:
         return jsonify({"error": "Query cannot be empty"}), 400
-        
-    # Security: Limit write operations to protect testing database (optional but nice)
+
     query_lower = query.lower()
     for verb in ['delete ', 'drop ', 'alter ', 'update ']:
         if verb in query_lower:
             return jsonify({"error": f"Write operations ({verb.strip().upper()}) are disabled in this query editor."}), 403
-            
+
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
         cursor.execute(query)
-        
-        # If it's a SELECT query, return rows and columns
+
         if cursor.description:
             columns = [col[0] for col in cursor.description]
             rows = [list(row) for row in cursor.fetchall()]
@@ -198,7 +247,7 @@ def run_query():
                 "message": "Query executed successfully.",
                 "row_count": affected
             })
-            
+
     except Exception as e:
         conn.close()
         return jsonify({"error": str(e)}), 400

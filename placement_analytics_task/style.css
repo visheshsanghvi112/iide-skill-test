@@ -651,6 +651,72 @@ html, body {
     line-height: 1.6;
 }
 
+/* ── Data Quality Alerts Strip ────────── */
+.dq-alerts-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+    flex-wrap: wrap;
+}
+
+.dq-alert-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 4px;
+    white-space: nowrap;
+}
+
+.dq-alert-title i { color: var(--amber); }
+
+.dq-alert-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 99px;
+    font-size: 12px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.dq-alert-item.red {
+    background: var(--red-light);
+    border-color: #fca5a5;
+    color: var(--red);
+}
+
+.dq-alert-item.amber {
+    background: var(--amber-light);
+    border-color: #fde68a;
+    color: var(--amber);
+}
+
+.dq-alert-item.blue {
+    background: var(--blue-light);
+    border-color: #93c5fd;
+    color: var(--blue);
+}
+
+.dq-count {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.dq-label { font-weight: 500; }
+
 /* ── Utilities ────────────────────────── */
 .mt-4 { margin-top: 20px; }
 .flex-between { display: flex; justify-content: space-between; align-items: center; }

@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
     <div class="app-container">
@@ -60,12 +60,11 @@
 
             <!-- TAB 1: DASHBOARD VIEW -->
             <section id="tab-dashboard" class="tab-content active">
+
                 <!-- KPI Banner Grid -->
                 <div class="kpi-grid">
                     <div class="kpi-card">
-                        <div class="kpi-icon-wrapper blue">
-                            <i class="fa-solid fa-user-graduate"></i>
-                        </div>
+                        <div class="kpi-icon-wrapper blue"><i class="fa-solid fa-user-graduate"></i></div>
                         <div class="kpi-info">
                             <h3>Total Enrolments</h3>
                             <div class="value" id="kpi-registered">113</div>
@@ -73,9 +72,7 @@
                         </div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-icon-wrapper purple">
-                            <i class="fa-solid fa-user-check"></i>
-                        </div>
+                        <div class="kpi-icon-wrapper purple"><i class="fa-solid fa-user-check"></i></div>
                         <div class="kpi-info">
                             <h3>Placement Eligible</h3>
                             <div class="value" id="kpi-eligible">38</div>
@@ -83,114 +80,151 @@
                         </div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-icon-wrapper green">
-                            <i class="fa-solid fa-briefcase"></i>
-                        </div>
+                        <div class="kpi-icon-wrapper green"><i class="fa-solid fa-briefcase"></i></div>
                         <div class="kpi-info">
-                            <h3>Hired & Placed</h3>
+                            <h3>Hired &amp; Placed</h3>
                             <div class="value" id="kpi-placed">16</div>
                             <span class="trend success"><b id="hired-pct">42.1%</b> eligible placement rate</span>
                         </div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-icon-wrapper orange">
-                            <i class="fa-solid fa-magnifying-glass-chart"></i>
-                        </div>
+                        <div class="kpi-icon-wrapper orange"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
                         <div class="kpi-info">
-                            <h3>Job Openings</h3>
-                            <div class="value" id="kpi-jobs">7,708</div>
-                            <span class="trend warning"><b id="kpi-active-jobs">289</b> active postings</span>
+                            <h3>Active Job Openings</h3>
+                            <div class="value" id="kpi-active-jobs">289</div>
+                            <span class="trend warning"><b id="kpi-total-jobs">7,708</b> total (historical)</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts Layout Grid -->
+                <!-- Data Quality Alerts Strip -->
+                <div class="dq-alerts-strip" id="dq-alerts-strip">
+                    <div class="dq-alert-title"><i class="fa-solid fa-triangle-exclamation"></i> Data Quality Alerts</div>
+                    <div class="dq-alert-item red">
+                        <span class="dq-count" id="dq-null-status">27</span>
+                        <span class="dq-label">Interviews with no outcome status</span>
+                    </div>
+                    <div class="dq-alert-item amber">
+                        <span class="dq-count" id="dq-stage-mismatch">5</span>
+                        <span class="dq-label">Hired students with stale Candidate Stage</span>
+                    </div>
+                    <div class="dq-alert-item amber">
+                        <span class="dq-count" id="dq-null-location">13</span>
+                        <span class="dq-label">Candidates missing job location preference</span>
+                    </div>
+                    <div class="dq-alert-item blue">
+                        <span class="dq-count" id="dq-ko-no-reason">1</span>
+                        <span class="dq-label">Knock-off with no reason recorded</span>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
                 <div class="dashboard-grid">
-                    <!-- Funnel Analysis Card -->
+                    <!-- Funnel -->
                     <div class="card span-2">
                         <div class="card-header">
                             <h3>Placement Ingestion Funnel</h3>
                             <span class="card-subtitle">Dropouts across successive recruitment stages</span>
                         </div>
-                        <div class="card-body chart-h-300">
-                            <canvas id="chart-funnel"></canvas>
-                        </div>
+                        <div class="card-body chart-h-300"><canvas id="chart-funnel"></canvas></div>
                     </div>
 
-                    <!-- Dropout Bottlenecks Card -->
+                    <!-- Knockoffs -->
                     <div class="card">
                         <div class="card-header">
                             <h3>Student Knock-off Reasons</h3>
                             <span class="card-subtitle">Master enrolment dropout causes</span>
                         </div>
-                        <div class="card-body flex-center chart-h-300">
-                            <canvas id="chart-knockoffs"></canvas>
-                        </div>
+                        <div class="card-body flex-center chart-h-300"><canvas id="chart-knockoffs"></canvas></div>
                     </div>
 
-                    <!-- Batch Performance Analysis -->
+                    <!-- Batch Performance -->
                     <div class="card span-2">
                         <div class="card-header">
                             <h3>Batch Performance Comparison</h3>
-                            <span class="card-subtitle">Student distribution and hiring outcomes per training cohort</span>
+                            <span class="card-subtitle">Registered vs Eligible vs Hired per training cohort</span>
                         </div>
-                        <div class="card-body chart-h-300">
-                            <canvas id="chart-batches"></canvas>
-                        </div>
+                        <div class="card-body chart-h-300"><canvas id="chart-batches"></canvas></div>
                     </div>
 
-                    <!-- Interview Cancellations Card -->
+                    <!-- Interview Status Breakdown (NEW) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Interview Outcome Status</h3>
+                            <span class="card-subtitle">Breakdown of all 121 interview rounds</span>
+                        </div>
+                        <div class="card-body flex-center chart-h-300"><canvas id="chart-interview-status"></canvas></div>
+                    </div>
+
+                    <!-- Cancellations -->
                     <div class="card">
                         <div class="card-header">
                             <h3>Interview Cancel Reasons</h3>
                             <span class="card-subtitle">Reasons for scheduled round cancellations</span>
                         </div>
-                        <div class="card-body chart-h-250">
-                            <canvas id="chart-cancellations"></canvas>
-                        </div>
+                        <div class="card-body chart-h-250"><canvas id="chart-cancellations"></canvas></div>
                     </div>
 
-                    <!-- Top Skills Grid -->
+                    <!-- Top Skills -->
                     <div class="card">
                         <div class="card-header">
                             <h3>Top Candidate Skills</h3>
-                            <span class="card-subtitle">Most frequent skills in eligible candidates</span>
+                            <span class="card-subtitle">Most frequent skills (extracted from skill blob)</span>
                         </div>
-                        <div class="card-body chart-h-250">
-                            <canvas id="chart-skills"></canvas>
-                        </div>
+                        <div class="card-body chart-h-250"><canvas id="chart-skills"></canvas></div>
                     </div>
 
-                    <!-- Demographics: Location preference -->
+                    <!-- Location -->
                     <div class="card">
                         <div class="card-header">
                             <h3>Preferred Work Location</h3>
-                            <span class="card-subtitle">Work style/office preference</span>
+                            <span class="card-subtitle">13 candidates have no preference set</span>
                         </div>
-                        <div class="card-body flex-center chart-h-250">
-                            <canvas id="chart-locations"></canvas>
-                        </div>
+                        <div class="card-body flex-center chart-h-250"><canvas id="chart-locations"></canvas></div>
                     </div>
 
-                    <!-- Top Hiring Roles -->
+                    <!-- Active Job Roles (NEW — active only, not total) -->
                     <div class="card">
                         <div class="card-header">
-                            <h3>Top Job Postings</h3>
-                            <span class="card-subtitle">Highest volume roles in Job Openings</span>
+                            <h3>Top Active Job Roles</h3>
+                            <span class="card-subtitle">In-progress openings only (289 of 7,708)</span>
                         </div>
-                        <div class="card-body chart-h-250">
-                            <canvas id="chart-roles"></canvas>
-                        </div>
+                        <div class="card-body chart-h-250"><canvas id="chart-roles"></canvas></div>
                     </div>
                 </div>
 
-                <!-- Section: Executive Operational Insights -->
+                <!-- Neglected Candidates (NEW) -->
+                <div class="dashboard-grid mt-4">
+                    <div class="card span-2">
+                        <div class="card-header flex-between">
+                            <div>
+                                <h3>Neglected Candidates — Applied but Never Interviewed</h3>
+                                <span class="card-subtitle warning-text"><i class="fa-solid fa-circle-exclamation"></i> These candidates submitted many applications but have 0 interview rounds logged</span>
+                            </div>
+                            <span class="badge badge-warning">Action Required</span>
+                        </div>
+                        <div class="card-body chart-h-250"><canvas id="chart-neglected"></canvas></div>
+                        <div class="card-footer"><i class="fa-solid fa-circle-info"></i> <strong>Audit Finding:</strong> Anthony Evans (104 apps), Grace Rivera (51), Serenity Sanders (43) — all have applied extensively but no recruiter ever scheduled a single interview round.</div>
+                    </div>
+
+                    <!-- Job Opening Status Donut (NEW) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Job Opening Status Mix</h3>
+                            <span class="card-subtitle">Status breakdown of all 7,708 postings</span>
+                        </div>
+                        <div class="card-body flex-center chart-h-250"><canvas id="chart-job-status"></canvas></div>
+                        <div class="card-footer"><i class="fa-solid fa-circle-info"></i> Only <strong>289 (3.7%)</strong> are actively hiring. 2,926 are cancelled.</div>
+                    </div>
+                </div>
+
+                <!-- Recruiter Discrepancy Audit -->
                 <div class="dashboard-grid mt-4">
                     <div class="card span-3">
                         <div class="card-header flex-between">
                             <div>
                                 <h3>Recruiter-Tracker Integrity Discrepancies</h3>
-                                <span class="card-subtitle warning-text"><i class="fa-solid fa-circle-exclamation"></i> Identified 5 candidates marked as 'Hired' in Enrolments but missing matching 'Hired' application workflows</span>
+                                <span class="card-subtitle warning-text"><i class="fa-solid fa-circle-exclamation"></i> 6 candidates marked 'Hired' in Enrolments but missing recruiter workflow records</span>
                             </div>
                             <span class="badge badge-warning">Process Compliance Gap</span>
                         </div>
@@ -198,26 +232,24 @@
                             <table class="data-table" id="discrepancy-table">
                                 <thead>
                                     <tr>
-                                        <th>Enrolment ID</th>
-                                        <th>Candidate ID</th>
                                         <th>Candidate Name</th>
+                                        <th>Candidate ID</th>
                                         <th>Enrolment Stage</th>
-                                        <th>Application Ingestion Integrity Issue</th>
+                                        <th>Applications Count</th>
+                                        <th>Interviews Count</th>
+                                        <th>Issue Type</th>
                                     </tr>
                                 </thead>
-                                <tbody id="discrepancy-rows">
-                                    <!-- Populated dynamically -->
-                                </tbody>
+                                <tbody id="discrepancy-rows"></tbody>
                             </table>
                         </div>
-                        <div class="card-footer">
-                            <i class="fa-solid fa-circle-info"></i> <strong>Executive Takeaway</strong>: Candidates Naomi Bennett, Eva Hughes, and Madison Young have 0 applications in the recruiter system but are marked 'Hired' in Enrolments (likely off-campus or direct placements). Henry Gonzalez and Abigail Sanchez have active applications but their final status remains un-updated in the recruitment table.
-                        </div>
+                        <div class="card-footer"><i class="fa-solid fa-circle-info"></i> <strong>Type A (Off-platform):</strong> Eva Hughes, Madison Young, Naomi Bennett — 0 apps, 0 interviews. <strong>Type B (Status not updated):</strong> Henry Gonzalez, Penelope Mitchell, Aria Martin — have apps but 0 interviews logged.</div>
                     </div>
                 </div>
             </section>
 
             <!-- TAB 2: SCHEMA GRAPH VIEW -->
+
             <section id="tab-schema" class="tab-content">
                 <div class="card">
                     <div class="card-header">

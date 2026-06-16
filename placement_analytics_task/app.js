@@ -99,11 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             refreshBtn.disabled = true;
             refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
-            
+
             const res = await fetch('/api/dashboard-stats');
             const data = await res.json();
-            
-            populateKPIs(data.funnel);
+
+            populateKPIs(data.funnel, data.jobs);
+            populateDQAlerts(data.data_quality);
             renderFunnelChart(data.funnel);
             renderKnockoffsChart(data.knock_off_reasons);
             renderCancellationsChart(data.interview_cancellations);
@@ -111,6 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderSkillsChart(data.skill_counts);
             renderRolesChart(data.top_roles);
             renderBatchesChart(data.batch_performance);
+            renderInterviewStatusChart(data.interview_statuses);
+            renderNeglectedChart(data.neglected_candidates);
+            renderJobStatusChart(data.job_statuses);
             populateDiscrepancyTable(data.discrepancies);
 
         } catch (error) {
@@ -132,17 +136,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 1. Populate KPI Cards ---
-    function populateKPIs(funnel) {
+    function populateKPIs(funnel, jobs) {
         document.getElementById('kpi-registered').innerText = funnel.registered;
         document.getElementById('kpi-eligible').innerText = funnel.eligible;
         document.getElementById('kpi-placed').innerText = funnel.placed;
-        
-        // Percentages
+        // Active jobs KPI (audit-corrected: show active, not total)
+        document.getElementById('kpi-active-jobs').innerText = jobs.active.toLocaleString();
+        document.getElementById('kpi-total-jobs').innerText = jobs.total.toLocaleString();
         const eligiblePct = ((funnel.eligible / funnel.registered) * 100).toFixed(1);
         const hiredPct = ((funnel.placed / funnel.eligible) * 100).toFixed(1);
-        
         document.getElementById('eligible-pct').innerText = `${eligiblePct}%`;
         document.getElementById('hired-pct').innerText = `${hiredPct}%`;
+    }
+
+    // --- 2. Populate Data Quality Alerts ---
+    function populateDQAlerts(dq) {
+        document.getElementById('dq-null-status').innerText = dq.null_interview_status;
+        document.getElementById('dq-stage-mismatch').innerText = dq.stage_mismatch_count;
+        document.getElementById('dq-null-location').innerText = dq.null_location;
+        document.getElementById('dq-ko-no-reason').innerText = dq.ko_no_reason;
     }
 
     // --- 2. Ingestion Funnel Chart ---
@@ -449,26 +461,125 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 9. Populate Discrepancy Table ---
+    // --- 9. Populate Discrepancy Audit Table ---
     function populateDiscrepancyTable(discrepancies) {
         const tbody = document.getElementById('discrepancy-rows');
         tbody.innerHTML = '';
-        
+
         discrepancies.forEach(row => {
             const tr = document.createElement('tr');
-            
-            const desc = row.candidate_id 
-                ? "Candidate has 0 Placements/Hired updates in Applications tracker despite Enrolment = 'Hired'"
-                : "Missing placement details entirely in candidates tracker";
-            
+            const isOffPlatform = row.app_count === 0;
+            const issueType = isOffPlatform
+                ? '<span class="badge" style="background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;">Off-Platform Hire</span>'
+                : '<span class="badge" style="background:#fef3c7;color:#d97706;border:1px solid #fde68a;">Status Not Updated</span>';
+
             tr.innerHTML = `
-                <td><code>${row.enrolment_id}</code></td>
-                <td><code>${row.candidate_id || 'NULL'}</code></td>
-                <td>${row.name}</td>
+                <td><strong>${row.name}</strong></td>
+                <td><code style="font-size:10px">${row.candidate_id || 'NULL'}</code></td>
                 <td><span class="badge badge-warning">${row.stage}</span></td>
-                <td class="text-danger"><i class="fa-solid fa-triangle-exclamation"></i> ${desc}</td>
+                <td style="text-align:center;font-weight:700;color:${row.app_count === 0 ? '#dc2626' : '#059669'}">${row.app_count}</td>
+                <td style="text-align:center;font-weight:700;color:#dc2626">${row.interview_count}</td>
+                <td>${issueType}</td>
             `;
             tbody.appendChild(tr);
+        });
+    }
+
+    // --- 10. Interview Status Breakdown Chart (NEW) ---
+    function renderInterviewStatusChart(statuses) {
+        const ctx = prepareCanvas('interviewStatus', 'chart-interview-status');
+        const labels = statuses.map(s => s.status);
+        const values = statuses.map(s => s.count);
+        charts['interviewStatus'] = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        'rgba(245,158,11,0.8)',
+                        'rgba(100,116,139,0.8)',
+                        'rgba(220,38,38,0.8)',
+                        'rgba(5,150,105,0.8)',
+                        'rgba(14,165,233,0.8)',
+                        'rgba(124,58,237,0.8)',
+                        'rgba(244,63,94,0.8)'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { font: { size: 10 }, padding: 10 } }
+                }
+            }
+        });
+    }
+
+    // --- 11. Neglected Candidates Chart (NEW) ---
+    function renderNeglectedChart(candidates) {
+        const ctx = prepareCanvas('neglected', 'chart-neglected');
+        const labels = candidates.map(c => c.name);
+        const values = candidates.map(c => c.app_count);
+        charts['neglected'] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Applications Submitted (0 Interviews)',
+                    data: values,
+                    backgroundColor: 'rgba(220,38,38,0.75)',
+                    borderColor: '#dc2626',
+                    borderWidth: 1.5,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#64748b' } },
+                    x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 11 } } }
+                }
+            }
+        });
+    }
+
+    // --- 12. Job Opening Status Donut (NEW) ---
+    function renderJobStatusChart(statuses) {
+        const ctx = prepareCanvas('jobStatus', 'chart-job-status');
+        const labels = statuses.map(s => s.status);
+        const values = statuses.map(s => s.count);
+        charts['jobStatus'] = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        'rgba(220,38,38,0.8)',
+                        'rgba(100,116,139,0.8)',
+                        'rgba(148,163,184,0.8)',
+                        'rgba(5,150,105,0.8)',
+                        'rgba(245,158,11,0.8)',
+                        'rgba(14,165,233,0.8)',
+                        'rgba(37,99,235,0.9)'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 8 } }
+                }
+            }
         });
     }
 
