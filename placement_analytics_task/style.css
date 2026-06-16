@@ -752,3 +752,172 @@ html, body {
     .card.span-2, .card.span-3 { grid-column: span 1; }
     .sandbox-layout { grid-template-columns: 1fr; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Schema Tab — Stat Bar
+───────────────────────────────────────────────────────────── */
+.schema-stat-bar {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 14px 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+    gap: 0;
+    flex-wrap: wrap;
+}
+.schema-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 24px;
+    flex: 1;
+    min-width: 90px;
+}
+.schema-stat-num {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+}
+.schema-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 2px;
+    text-align: center;
+}
+.schema-stat-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--card-border);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ERD Canvas — Scrollable absolute-positioned diagram
+───────────────────────────────────────────────────────────── */
+.erd-canvas {
+    position: relative;
+    width: 1400px;
+    min-height: 660px;
+    overflow-x: auto;
+}
+.card-body.p-0 {
+    padding: 0;
+    overflow-x: auto;
+}
+
+/* ─── ERD Table Boxes ──────────────────────────────────────── */
+.erd-table {
+    position: absolute;
+    width: 240px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: #fff;
+    font-size: 12px;
+    z-index: 2;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+.erd-table:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+    transform: translateY(-2px);
+}
+
+.erd-table-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    color: #fff;
+    font-weight: 700;
+}
+.erd-table-header i { font-size: 16px; opacity: 0.9; }
+.erd-table-name { font-size: 13px; font-weight: 700; }
+.erd-table-meta { font-size: 10px; opacity: 0.8; font-weight: 400; }
+
+/* Per-table header colors */
+.erd-table-header.enrolments   { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+.erd-table-header.candidates   { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
+.erd-table-header.jobs         { background: linear-gradient(135deg, #f59e0b, #b45309); }
+.erd-table-header.applications { background: linear-gradient(135deg, #10b981, #065f46); }
+.erd-table-header.interviews   { background: linear-gradient(135deg, #f43f5e, #be123c); }
+
+/* ─── ERD Fields ───────────────────────────────────────────── */
+.erd-fields { padding: 6px 0; }
+
+.erd-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    line-height: 1.3;
+}
+.erd-field:last-child { border-bottom: none; }
+
+.erd-field.pk  { background: #fef9ff; border-left: 3px solid #7c3aed; }
+.erd-field.fk  { background: #f0f9ff; border-left: 3px solid #0ea5e9; }
+.erd-field.dq  { background: #fffbeb; border-left: 3px solid #f59e0b; }
+
+.erd-field-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 16px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    background: #7c3aed;
+    color: #fff;
+    flex-shrink: 0;
+    padding: 0 3px;
+}
+.erd-field-key.fk-key { background: #0ea5e9; }
+.erd-field-key.dq-key { background: #f59e0b; color: #fff; }
+.erd-field-key.gray   { background: #94a3b8; }
+
+.erd-field-note {
+    font-size: 10px;
+    color: #94a3b8;
+    font-style: italic;
+    margin-left: 2px;
+}
+
+/* ─── SVG Arrow Layer ──────────────────────────────────────── */
+.erd-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ─── Legend ───────────────────────────────────────────────── */
+.erd-legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+.erd-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+.erd-legend-dot.pk  { background: #7c3aed; }
+.erd-legend-dot.fk  { background: #0ea5e9; }
+.erd-legend-dot.dq  { background: #f59e0b; }

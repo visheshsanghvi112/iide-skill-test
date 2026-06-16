@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
     <div class="app-container">
@@ -251,162 +251,277 @@
             <!-- TAB 2: SCHEMA GRAPH VIEW -->
 
             <section id="tab-schema" class="tab-content">
+
+                <!-- Schema Header Stats -->
+                <div class="schema-stat-bar">
+                    <div class="schema-stat"><span class="schema-stat-num">5</span><span class="schema-stat-label">Normalized Tables</span></div>
+                    <div class="schema-stat-divider"></div>
+                    <div class="schema-stat"><span class="schema-stat-num">3NF</span><span class="schema-stat-label">Normal Form</span></div>
+                    <div class="schema-stat-divider"></div>
+                    <div class="schema-stat"><span class="schema-stat-num">4</span><span class="schema-stat-label">Foreign Key Links</span></div>
+                    <div class="schema-stat-divider"></div>
+                    <div class="schema-stat"><span class="schema-stat-num">4</span><span class="schema-stat-label">Indexes Created</span></div>
+                    <div class="schema-stat-divider"></div>
+                    <div class="schema-stat"><span class="schema-stat-num">782</span><span class="schema-stat-label">Applications</span></div>
+                    <div class="schema-stat-divider"></div>
+                    <div class="schema-stat"><span class="schema-stat-num">121</span><span class="schema-stat-label">Interviews</span></div>
+                </div>
+
+                <!-- ERD Diagram -->
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Relational Database Schema Design (3NF Normalized)</h3>
-                        <span class="card-subtitle">Visual Entity-Relationship Architecture optimized for referential integrity & zero redundancy</span>
-                    </div>
-                        <div class="schema-flow-container">
-                            <!-- Column 1: Core Inputs -->
-                            <div class="schema-flow-col">
-                                <div class="schema-group-title"><i class="fa-solid fa-right-to-bracket"></i> Master Data Inputs</div>
-                                
-                                <!-- enrolments -->
-                                <div class="schema-table card-enrolments">
-                                    <div class="table-title header-enrolments">enrolments</div>
-                                    <div class="table-fields">
-                                        <div class="field pk">enrolment_id <span>TEXT (PK)</span></div>
-                                        <div class="field">enrolment_owner <span>TEXT</span></div>
-                                        <div class="field">enrolment_name <span>TEXT</span></div>
-                                        <div class="field">first_name <span>TEXT</span></div>
-                                        <div class="field">last_name <span>TEXT</span></div>
-                                        <div class="field">email <span>TEXT</span></div>
-                                        <div class="field">batch_name <span>TEXT</span></div>
-                                        <div class="field">stage <span>TEXT</span></div>
-                                        <div class="field fk">candidate_id <span>TEXT (FK → candidates)</span></div>
-                                        <div class="field">created_time <span>TEXT</span></div>
-                                        <div class="field">job_role_preference_1 <span>TEXT</span></div>
-                                        <div class="field">job_role_preference_2 <span>TEXT</span></div>
-                                        <div class="field">knocked_off_reason <span>TEXT</span></div>
-                                        <div class="field">on_hold_reason <span>TEXT</span></div>
-                                        <div class="field">course_name <span>TEXT</span></div>
-                                        <div class="field">preferred_job_type <span>TEXT</span></div>
-                                        <div class="field">college_name <span>TEXT</span></div>
-                                        <div class="field">degree <span>TEXT</span></div>
-                                        <div class="field">graduation_year <span>TEXT</span></div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Connector: enrolments -> candidates -->
-                                <div class="schema-connector-vertical-arrow">
-                                    <i class="fa-solid fa-arrow-down"></i>
-                                    <span>1 : 0..1 Relationship</span>
-                                </div>
-
-                                <!-- candidates -->
-                                <div class="schema-table card-candidates">
-                                    <div class="table-title header-candidates">candidates</div>
-                                    <div class="table-fields">
-                                        <div class="field pk">candidate_id <span>TEXT (PK)</span></div>
-                                        <div class="field">first_name <span>TEXT</span></div>
-                                        <div class="field">last_name <span>TEXT</span></div>
-                                        <div class="field">phone_number <span>TEXT</span></div>
-                                        <div class="field">email <span>TEXT (UNIQUE)</span></div>
-                                        <div class="field">city <span>TEXT</span></div>
-                                        <div class="field">province <span>TEXT</span></div>
-                                        <div class="field">country <span>TEXT</span></div>
-                                        <div class="field">skill_set <span>TEXT</span></div>
-                                        <div class="field">candidate_stage <span>TEXT</span></div>
-                                        <div class="field">batch_name <span>TEXT</span></div>
-                                        <div class="field">age <span>INTEGER</span></div>
-                                        <div class="field">preferred_job_location <span>TEXT</span></div>
-                                        <div class="field">gender <span>TEXT</span></div>
-                                        <div class="field">strength_area_1 <span>TEXT</span></div>
-                                        <div class="field">strength_area_2 <span>TEXT</span></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="schema-col-spacer"></div>
-
-                                <!-- job_openings -->
-                                <div class="schema-table card-jobs">
-                                    <div class="table-title header-jobs">job_openings</div>
-                                    <div class="table-fields">
-                                        <div class="field pk">job_opening_id <span>TEXT (PK)</span></div>
-                                        <div class="field">account_manager_id <span>TEXT</span></div>
-                                        <div class="field">job_type <span>TEXT</span></div>
-                                        <div class="field">posting_title <span>TEXT</span></div>
-                                        <div class="field">job_opening_status <span>TEXT</span></div>
-                                        <div class="field">date_opened <span>TEXT</span></div>
-                                        <div class="field">city <span>TEXT</span></div>
-                                        <div class="field">province <span>TEXT</span></div>
-                                        <div class="field">country <span>TEXT</span></div>
-                                        <div class="field">created_time <span>TEXT</span></div>
-                                        <div class="field">salary <span>TEXT</span></div>
-                                        <div class="field">profile <span>TEXT</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Column 2: Connectors (Left to Center) -->
-                            <div class="schema-flow-connector-col">
-                                <div class="connector-block-top">
-                                    <div class="connector-line-h"></div>
-                                    <span>candidates (1) ──> (N) apps</span>
-                                </div>
-                                <div class="connector-block-bottom">
-                                    <div class="connector-line-h"></div>
-                                    <span>jobs (1) ──> (N) apps</span>
-                                </div>
-                            </div>
-
-                            <!-- Column 3: The Junction -->
-                            <div class="schema-flow-col center-col">
-                                <div class="schema-group-title"><i class="fa-solid fa-code-fork"></i> Transaction Junction</div>
-                                
-                                <!-- applications -->
-                                <div class="schema-table card-applications">
-                                    <div class="table-title header-applications">applications</div>
-                                    <div class="table-fields">
-                                        <div class="field pk">application_id <span>TEXT (PK)</span></div>
-                                        <div class="field fk">candidate_id <span>TEXT (FK → candidates)</span></div>
-                                        <div class="field fk">job_opening_id <span>TEXT (FK → job_openings)</span></div>
-                                        <div class="field">application_stage <span>TEXT</span></div>
-                                        <div class="field">application_status <span>TEXT</span></div>
-                                        <div class="field">created_time <span>TEXT</span></div>
-                                        <div class="field">batch_name <span>TEXT</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Column 4: Connector (Center to Right) -->
-                            <div class="schema-flow-connector-col">
-                                <div class="connector-block-single">
-                                    <div class="connector-line-h"></div>
-                                    <span>apps (1) ──> (N) interviews</span>
-                                </div>
-                            </div>
-
-                            <!-- Column 5: Core Outputs -->
-                            <div class="schema-flow-col">
-                                <div class="schema-group-title"><i class="fa-solid fa-square-poll-vertical"></i> Progressive Logs</div>
-                                
-                                <!-- interviews -->
-                                <div class="schema-table card-interviews">
-                                    <div class="table-title header-interviews">interviews</div>
-                                    <div class="table-fields">
-                                        <div class="field pk">interview_id <span>TEXT (PK)</span></div>
-                                        <div class="field">interview_owner_id <span>TEXT</span></div>
-                                        <div class="field">interview_name <span>TEXT</span></div>
-                                        <div class="field">client_id <span>TEXT</span></div>
-                                        <div class="field fk">application_id <span>TEXT (FK → applications)</span></div>
-                                        <div class="field">from_time <span>TEXT</span></div>
-                                        <div class="field">to_time <span>TEXT</span></div>
-                                        <div class="field">interview_type <span>TEXT</span></div>
-                                        <div class="field">interview_status <span>TEXT</span></div>
-                                        <div class="field">batch_name <span>TEXT</span></div>
-                                        <div class="field">cancellation_reason <span>TEXT</span></div>
-                                        <div class="field">feedback <span>TEXT</span></div>
-                                        <div class="field">created_time <span>TEXT</span></div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="card-header flex-between">
+                        <div>
+                            <h3>Entity Relationship Diagram (ERD)</h3>
+                            <span class="card-subtitle">5-table normalized schema — click any table to highlight its connections</span>
+                        </div>
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                            <span class="erd-legend"><span class="erd-legend-dot pk"></span> Primary Key</span>
+                            <span class="erd-legend"><span class="erd-legend-dot fk"></span> Foreign Key</span>
+                            <span class="erd-legend"><span class="erd-legend-dot dq"></span> Data Quality Note</span>
                         </div>
                     </div>
-                    <div class="card-footer">
-                        <p><strong>Database Architecture Summary</strong>: To remove the redundancies in the raw data files, we normalized the tables to 3NF. Redundant contact info (email, phone, name) was eliminated from <code>applications</code> since it can be joined via <code>candidate_id</code>. In addition, the <code>interviews</code> table connects directly to <code>applications</code> using the <code>application_id</code> foreign key, representing the exact logical relationship (interviews occur in the context of an application).</p>
+                    <div class="card-body p-0">
+                        <div class="erd-canvas">
+
+                            <!-- ── ENROLMENTS ── -->
+                            <div class="erd-table" id="erd-enrolments" style="left:20px;top:30px">
+                                <div class="erd-table-header enrolments">
+                                    <i class="fa-solid fa-clipboard-list"></i>
+                                    <div>
+                                        <div class="erd-table-name">enrolments</div>
+                                        <div class="erd-table-meta">113 rows · 19 cols</div>
+                                    </div>
+                                </div>
+                                <div class="erd-fields">
+                                    <div class="erd-field pk"><span class="erd-field-key">PK</span>enrolment_id</div>
+                                    <div class="erd-field fk"><span class="erd-field-key fk-key">FK</span>candidate_id <span class="erd-field-note">→ candidates (nullable)</span></div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>first_name, last_name</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>stage</div>
+                                    <div class="erd-field dq"><span class="erd-field-key dq-key">DQ</span>knocked_off_reason <span class="erd-field-note">1 NULL</span></div>
+                                    <div class="erd-field dq"><span class="erd-field-key dq-key">DQ</span>75 rows missing FK <span class="erd-field-note">not yet profiled</span></div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>batch_name, email, stage</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">+9</span>more fields…</div>
+                                </div>
+                            </div>
+
+                            <!-- ── CANDIDATES ── -->
+                            <div class="erd-table" id="erd-candidates" style="left:380px;top:30px">
+                                <div class="erd-table-header candidates">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    <div>
+                                        <div class="erd-table-name">candidates</div>
+                                        <div class="erd-table-meta">38 rows · 16 cols</div>
+                                    </div>
+                                </div>
+                                <div class="erd-fields">
+                                    <div class="erd-field pk"><span class="erd-field-key">PK</span>candidate_id</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">UQ</span>email <span class="erd-field-note">UNIQUE</span></div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>first_name, last_name</div>
+                                    <div class="erd-field dq"><span class="erd-field-key dq-key">DQ</span>skill_set <span class="erd-field-note">comma-blob, not split</span></div>
+                                    <div class="erd-field dq"><span class="erd-field-key dq-key">DQ</span>preferred_job_location <span class="erd-field-note">13 NULL</span></div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>candidate_stage, batch_name</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>city, gender, age</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">+5</span>more fields…</div>
+                                </div>
+                            </div>
+
+                            <!-- ── JOB OPENINGS ── -->
+                            <div class="erd-table" id="erd-jobs" style="left:380px;top:370px">
+                                <div class="erd-table-header jobs">
+                                    <i class="fa-solid fa-building"></i>
+                                    <div>
+                                        <div class="erd-table-name">job_openings</div>
+                                        <div class="erd-table-meta">7,708 rows · 12 cols</div>
+                                    </div>
+                                </div>
+                                <div class="erd-fields">
+                                    <div class="erd-field pk"><span class="erd-field-key">PK</span>job_opening_id</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>posting_title, job_type</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>job_opening_status</div>
+                                    <div class="erd-field dq"><span class="erd-field-key dq-key">DQ</span>city <span class="erd-field-note">1,188 NULL (15.4%)</span></div>
+                                    <div class="erd-field dq"><span class="erd-field-key dq-key">DQ</span>salary <span class="erd-field-note">1,680 NULL (21.8%)</span></div>
+                                    <div class="erd-field dq"><span class="erd-field-key dq-key">DQ</span>3,150 content duplicates</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>province, country</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">+3</span>more fields…</div>
+                                </div>
+                            </div>
+
+                            <!-- ── APPLICATIONS ── -->
+                            <div class="erd-table" id="erd-applications" style="left:740px;top:200px">
+                                <div class="erd-table-header applications">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    <div>
+                                        <div class="erd-table-name">applications</div>
+                                        <div class="erd-table-meta">782 rows · 7 cols</div>
+                                    </div>
+                                </div>
+                                <div class="erd-fields">
+                                    <div class="erd-field pk"><span class="erd-field-key">PK</span>application_id</div>
+                                    <div class="erd-field fk"><span class="erd-field-key fk-key">FK</span>candidate_id → candidates</div>
+                                    <div class="erd-field fk"><span class="erd-field-key fk-key">FK</span>job_opening_id → job_openings</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>application_stage</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>application_status</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>batch_name, created_time</div>
+                                    <div class="erd-field dq" style="background:#f0fdf4;border-left:2px solid #059669"><span class="erd-field-key" style="background:#059669">✓</span>Removed: name, email, phone <span class="erd-field-note">3NF fix</span></div>
+                                </div>
+                            </div>
+
+                            <!-- ── INTERVIEWS ── -->
+                            <div class="erd-table" id="erd-interviews" style="left:1100px;top:200px">
+                                <div class="erd-table-header interviews">
+                                    <i class="fa-solid fa-comments"></i>
+                                    <div>
+                                        <div class="erd-table-name">interviews</div>
+                                        <div class="erd-table-meta">121 rows · 13 cols</div>
+                                    </div>
+                                </div>
+                                <div class="erd-fields">
+                                    <div class="erd-field pk"><span class="erd-field-key">PK</span>interview_id</div>
+                                    <div class="erd-field fk"><span class="erd-field-key fk-key">FK</span>application_id → applications</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>interview_type, interview_status</div>
+                                    <div class="erd-field dq"><span class="erd-field-key dq-key">DQ</span>interview_status <span class="erd-field-note">27 NULL (22%)</span></div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>cancellation_reason, feedback</div>
+                                    <div class="erd-field"><span class="erd-field-key gray">—</span>from_time, to_time</div>
+                                    <div class="erd-field dq" style="background:#f0fdf4;border-left:2px solid #059669"><span class="erd-field-key" style="background:#059669">✓</span>Resolved: no app_id in raw CSV <span class="erd-field-note">looked up via cand+job</span></div>
+                                </div>
+                            </div>
+
+                            <!-- SVG Relationship Arrows -->
+                            <svg class="erd-svg" xmlns="http://www.w3.org/2000/svg">
+                                <!-- enrolments → candidates (1:0..1) -->
+                                <defs>
+                                    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                        <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/>
+                                    </marker>
+                                    <marker id="arrow-fk" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                        <path d="M0,0 L0,6 L8,3 z" fill="#7c3aed"/>
+                                    </marker>
+                                    <marker id="arrow-app" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                                        <path d="M0,0 L0,6 L8,3 z" fill="#059669"/>
+                                    </marker>
+                                </defs>
+
+                                <!-- enrolments → candidates: candidate_id (nullable) -->
+                                <line x1="320" y1="90" x2="375" y2="90" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+                                <text x="330" y="82" fill="#64748b" font-size="10" font-family="Inter,sans-serif">candidate_id</text>
+                                <text x="330" y="94" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">1 : 0..1</text>
+
+                                <!-- candidates → applications: candidate_id -->
+                                <line x1="620" y1="130" x2="735" y2="270" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-fk)"/>
+                                <text x="645" y="190" fill="#7c3aed" font-size="10" font-family="Inter,sans-serif">candidate_id</text>
+                                <text x="645" y="203" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">1 : N</text>
+
+                                <!-- job_openings → applications: job_opening_id -->
+                                <line x1="620" y1="460" x2="735" y2="340" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-fk)"/>
+                                <text x="638" y="408" fill="#7c3aed" font-size="10" font-family="Inter,sans-serif">job_opening_id</text>
+                                <text x="648" y="420" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">1 : N</text>
+
+                                <!-- applications → interviews: application_id -->
+                                <line x1="980" y1="290" x2="1095" y2="290" stroke="#059669" stroke-width="2" marker-end="url(#arrow-app)"/>
+                                <text x="990" y="283" fill="#059669" font-size="10" font-family="Inter,sans-serif">application_id</text>
+                                <text x="1000" y="296" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">1 : N</text>
+                            </svg>
+
+                        </div>
                     </div>
                 </div>
+
+                <!-- Before vs After + Key Decisions -->
+                <div class="dashboard-grid mt-4" style="grid-template-columns:1fr 1fr">
+
+                    <!-- Before vs After -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Raw CSV vs Normalized DB</h3>
+                            <span class="card-subtitle">What we removed and why</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>Issue in Raw CSV</th><th>Our Fix</th><th>Impact</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>18-digit IDs read as floats → silently rounded</td>
+                                        <td><code>dtype=str</code> on all ID columns</td>
+                                        <td>No broken joins</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Applications repeats name, email, phone per row</td>
+                                        <td>Dropped — join via <code>candidate_id</code></td>
+                                        <td>Single source of truth</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Interviews has no Application ID column</td>
+                                        <td>Looked up via <code>candidate_id + job_opening_id</code></td>
+                                        <td>Correct logical link</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Whitespace-only cells not NULL</td>
+                                        <td>Global regex → <code>NULL</code></td>
+                                        <td>Clean aggregations</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Enrolments FK to non-existent candidate</td>
+                                        <td>Set FK = <code>NULL</code> (ON DELETE SET NULL)</td>
+                                        <td>No FK violation crash</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Applications with invalid candidate/job FK</td>
+                                        <td>Row skipped entirely, warning printed</td>
+                                        <td>Referential integrity preserved</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Join Path Guide -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>How to JOIN These Tables</h3>
+                            <span class="card-subtitle">Correct join paths for common queries</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>Query Goal</th><th>Join Path</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Student's full profile from enrolment</td>
+                                        <td><code>enrolments → candidates</code> via <code>candidate_id</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Which jobs a candidate applied to</td>
+                                        <td><code>candidates → applications → job_openings</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Interview details for a candidate</td>
+                                        <td><code>candidates → applications → interviews</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>⚠️ Interviews → Applications join (Zoho)</td>
+                                        <td>Must match BOTH <code>candidate_id</code> AND <code>job_opening_id</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hired students with no recruiter workflow</td>
+                                        <td><code>enrolments WHERE stage='Hired'</code> + LEFT JOIN applications, check <code>COUNT = 0</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Top skills across all candidates</td>
+                                        <td><code>candidates.skill_set</code> split in Python or <code>LIKE '%skill%'</code> in SQL</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <i class="fa-solid fa-circle-info"></i> <strong>Index tip:</strong> All FK columns are indexed (<code>idx_enrolments_candidate</code>, <code>idx_applications_candidate</code>, <code>idx_applications_job</code>, <code>idx_interviews_application</code>) for fast joins.
+                        </div>
+                    </div>
+
+                </div>
+
             </section>
 
             <!-- TAB 3: SQL SANDBOX TAB -->
