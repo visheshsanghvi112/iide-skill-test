@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
     <div class="app-container">
@@ -224,118 +224,149 @@
                         <h3>Relational Database Schema Design (3NF Normalized)</h3>
                         <span class="card-subtitle">Visual Entity-Relationship Architecture optimized for referential integrity & zero redundancy</span>
                     </div>
-                    <div class="card-body">
-                        <div class="schema-layout">
-                            <!-- Table representation cards -->
-                            <div class="schema-table">
-                                <div class="table-title header-enrolments">enrolments</div>
-                                <div class="table-fields">
-                                    <div class="field pk">enrolment_id <span>TEXT (PK)</span></div>
-                                    <div class="field">enrolment_owner <span>TEXT</span></div>
-                                    <div class="field">enrolment_name <span>TEXT</span></div>
-                                    <div class="field">first_name <span>TEXT</span></div>
-                                    <div class="field">last_name <span>TEXT</span></div>
-                                    <div class="field">email <span>TEXT</span></div>
-                                    <div class="field">batch_name <span>TEXT</span></div>
-                                    <div class="field">stage <span>TEXT</span></div>
-                                    <div class="field fk">candidate_id <span>TEXT (FK → candidates)</span></div>
-                                    <div class="field">created_time <span>TEXT</span></div>
-                                    <div class="field">job_role_preference_1 <span>TEXT</span></div>
-                                    <div class="field">job_role_preference_2 <span>TEXT</span></div>
-                                    <div class="field">knocked_off_reason <span>TEXT</span></div>
-                                    <div class="field">on_hold_reason <span>TEXT</span></div>
-                                    <div class="field">course_name <span>TEXT</span></div>
-                                    <div class="field">preferred_job_type <span>TEXT</span></div>
-                                    <div class="field">college_name <span>TEXT</span></div>
-                                    <div class="field">degree <span>TEXT</span></div>
-                                    <div class="field">graduation_year <span>TEXT</span></div>
+                        <div class="schema-flow-container">
+                            <!-- Column 1: Core Inputs -->
+                            <div class="schema-flow-col">
+                                <div class="schema-group-title"><i class="fa-solid fa-right-to-bracket"></i> Master Data Inputs</div>
+                                
+                                <!-- enrolments -->
+                                <div class="schema-table card-enrolments">
+                                    <div class="table-title header-enrolments">enrolments</div>
+                                    <div class="table-fields">
+                                        <div class="field pk">enrolment_id <span>TEXT (PK)</span></div>
+                                        <div class="field">enrolment_owner <span>TEXT</span></div>
+                                        <div class="field">enrolment_name <span>TEXT</span></div>
+                                        <div class="field">first_name <span>TEXT</span></div>
+                                        <div class="field">last_name <span>TEXT</span></div>
+                                        <div class="field">email <span>TEXT</span></div>
+                                        <div class="field">batch_name <span>TEXT</span></div>
+                                        <div class="field">stage <span>TEXT</span></div>
+                                        <div class="field fk">candidate_id <span>TEXT (FK → candidates)</span></div>
+                                        <div class="field">created_time <span>TEXT</span></div>
+                                        <div class="field">job_role_preference_1 <span>TEXT</span></div>
+                                        <div class="field">job_role_preference_2 <span>TEXT</span></div>
+                                        <div class="field">knocked_off_reason <span>TEXT</span></div>
+                                        <div class="field">on_hold_reason <span>TEXT</span></div>
+                                        <div class="field">course_name <span>TEXT</span></div>
+                                        <div class="field">preferred_job_type <span>TEXT</span></div>
+                                        <div class="field">college_name <span>TEXT</span></div>
+                                        <div class="field">degree <span>TEXT</span></div>
+                                        <div class="field">graduation_year <span>TEXT</span></div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="schema-connector">
-                                <i class="fa-solid fa-link"></i>
-                                <span>1 : 0..1</span>
-                            </div>
-
-                            <div class="schema-table">
-                                <div class="table-title header-candidates">candidates</div>
-                                <div class="table-fields">
-                                    <div class="field pk">candidate_id <span>TEXT (PK)</span></div>
-                                    <div class="field">first_name <span>TEXT</span></div>
-                                    <div class="field">last_name <span>TEXT</span></div>
-                                    <div class="field">phone_number <span>TEXT</span></div>
-                                    <div class="field">email <span>TEXT (UNIQUE)</span></div>
-                                    <div class="field">city <span>TEXT</span></div>
-                                    <div class="field">province <span>TEXT</span></div>
-                                    <div class="field">country <span>TEXT</span></div>
-                                    <div class="field">skill_set <span>TEXT</span></div>
-                                    <div class="field">candidate_stage <span>TEXT</span></div>
-                                    <div class="field">batch_name <span>TEXT</span></div>
-                                    <div class="field">age <span>INTEGER</span></div>
-                                    <div class="field">preferred_job_location <span>TEXT</span></div>
-                                    <div class="field">gender <span>TEXT</span></div>
-                                    <div class="field">strength_area_1 <span>TEXT</span></div>
-                                    <div class="field">strength_area_2 <span>TEXT</span></div>
+                                
+                                <!-- Connector: enrolments -> candidates -->
+                                <div class="schema-connector-vertical-arrow">
+                                    <i class="fa-solid fa-arrow-down"></i>
+                                    <span>1 : 0..1 Relationship</span>
                                 </div>
-                            </div>
 
-                            <div class="schema-connector">
-                                <i class="fa-solid fa-link"></i>
-                                <span>1 : N</span>
-                            </div>
-
-                            <div class="schema-table">
-                                <div class="table-title header-applications">applications</div>
-                                <div class="table-fields">
-                                    <div class="field pk">application_id <span>TEXT (PK)</span></div>
-                                    <div class="field fk">candidate_id <span>TEXT (FK → candidates)</span></div>
-                                    <div class="field fk">job_opening_id <span>TEXT (FK → openings)</span></div>
-                                    <div class="field">application_stage <span>TEXT</span></div>
-                                    <div class="field">application_status <span>TEXT</span></div>
-                                    <div class="field">created_time <span>TEXT</span></div>
-                                    <div class="field">batch_name <span>TEXT</span></div>
+                                <!-- candidates -->
+                                <div class="schema-table card-candidates">
+                                    <div class="table-title header-candidates">candidates</div>
+                                    <div class="table-fields">
+                                        <div class="field pk">candidate_id <span>TEXT (PK)</span></div>
+                                        <div class="field">first_name <span>TEXT</span></div>
+                                        <div class="field">last_name <span>TEXT</span></div>
+                                        <div class="field">phone_number <span>TEXT</span></div>
+                                        <div class="field">email <span>TEXT (UNIQUE)</span></div>
+                                        <div class="field">city <span>TEXT</span></div>
+                                        <div class="field">province <span>TEXT</span></div>
+                                        <div class="field">country <span>TEXT</span></div>
+                                        <div class="field">skill_set <span>TEXT</span></div>
+                                        <div class="field">candidate_stage <span>TEXT</span></div>
+                                        <div class="field">batch_name <span>TEXT</span></div>
+                                        <div class="field">age <span>INTEGER</span></div>
+                                        <div class="field">preferred_job_location <span>TEXT</span></div>
+                                        <div class="field">gender <span>TEXT</span></div>
+                                        <div class="field">strength_area_1 <span>TEXT</span></div>
+                                        <div class="field">strength_area_2 <span>TEXT</span></div>
+                                    </div>
                                 </div>
-                            </div>
+                                
+                                <div class="schema-col-spacer"></div>
 
-                            <div class="schema-connector-vertical">
-                                <i class="fa-solid fa-link"></i>
-                                <span>1 : N</span>
-                            </div>
-
-                            <div class="schema-table">
-                                <div class="table-title header-interviews">interviews</div>
-                                <div class="table-fields">
-                                    <div class="field pk">interview_id <span>TEXT (PK)</span></div>
-                                    <div class="field">interview_owner_id <span>TEXT</span></div>
-                                    <div class="field">interview_name <span>TEXT</span></div>
-                                    <div class="field">client_id <span>TEXT</span></div>
-                                    <div class="field fk">application_id <span>TEXT (FK → apps)</span></div>
-                                    <div class="field">from_time <span>TEXT</span></div>
-                                    <div class="field">to_time <span>TEXT</span></div>
-                                    <div class="field">interview_type <span>TEXT</span></div>
-                                    <div class="field">interview_status <span>TEXT</span></div>
-                                    <div class="field">batch_name <span>TEXT</span></div>
-                                    <div class="field">cancellation_reason <span>TEXT</span></div>
-                                    <div class="field">feedback <span>TEXT</span></div>
-                                    <div class="field">created_time <span>TEXT</span></div>
+                                <!-- job_openings -->
+                                <div class="schema-table card-jobs">
+                                    <div class="table-title header-jobs">job_openings</div>
+                                    <div class="table-fields">
+                                        <div class="field pk">job_opening_id <span>TEXT (PK)</span></div>
+                                        <div class="field">account_manager_id <span>TEXT</span></div>
+                                        <div class="field">job_type <span>TEXT</span></div>
+                                        <div class="field">posting_title <span>TEXT</span></div>
+                                        <div class="field">job_opening_status <span>TEXT</span></div>
+                                        <div class="field">date_opened <span>TEXT</span></div>
+                                        <div class="field">city <span>TEXT</span></div>
+                                        <div class="field">province <span>TEXT</span></div>
+                                        <div class="field">country <span>TEXT</span></div>
+                                        <div class="field">created_time <span>TEXT</span></div>
+                                        <div class="field">salary <span>TEXT</span></div>
+                                        <div class="field">profile <span>TEXT</span></div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="schema-table secondary-table" style="grid-column: 5; grid-row: 3;">
-                                <div class="table-title header-jobs">job_openings</div>
-                                <div class="table-fields">
-                                    <div class="field pk">job_opening_id <span>TEXT (PK)</span></div>
-                                    <div class="field">account_manager_id <span>TEXT</span></div>
-                                    <div class="field">job_type <span>TEXT</span></div>
-                                    <div class="field">posting_title <span>TEXT</span></div>
-                                    <div class="field">job_opening_status <span>TEXT</span></div>
-                                    <div class="field">date_opened <span>TEXT</span></div>
-                                    <div class="field">city <span>TEXT</span></div>
-                                    <div class="field">province <span>TEXT</span></div>
-                                    <div class="field">country <span>TEXT</span></div>
-                                    <div class="field">created_time <span>TEXT</span></div>
-                                    <div class="field">salary <span>TEXT</span></div>
-                                    <div class="field">profile <span>TEXT</span></div>
+                            <!-- Column 2: Connectors (Left to Center) -->
+                            <div class="schema-flow-connector-col">
+                                <div class="connector-block-top">
+                                    <div class="connector-line-h"></div>
+                                    <span>candidates (1) ──> (N) apps</span>
+                                </div>
+                                <div class="connector-block-bottom">
+                                    <div class="connector-line-h"></div>
+                                    <span>jobs (1) ──> (N) apps</span>
+                                </div>
+                            </div>
+
+                            <!-- Column 3: The Junction -->
+                            <div class="schema-flow-col center-col">
+                                <div class="schema-group-title"><i class="fa-solid fa-code-fork"></i> Transaction Junction</div>
+                                
+                                <!-- applications -->
+                                <div class="schema-table card-applications">
+                                    <div class="table-title header-applications">applications</div>
+                                    <div class="table-fields">
+                                        <div class="field pk">application_id <span>TEXT (PK)</span></div>
+                                        <div class="field fk">candidate_id <span>TEXT (FK → candidates)</span></div>
+                                        <div class="field fk">job_opening_id <span>TEXT (FK → job_openings)</span></div>
+                                        <div class="field">application_stage <span>TEXT</span></div>
+                                        <div class="field">application_status <span>TEXT</span></div>
+                                        <div class="field">created_time <span>TEXT</span></div>
+                                        <div class="field">batch_name <span>TEXT</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Column 4: Connector (Center to Right) -->
+                            <div class="schema-flow-connector-col">
+                                <div class="connector-block-single">
+                                    <div class="connector-line-h"></div>
+                                    <span>apps (1) ──> (N) interviews</span>
+                                </div>
+                            </div>
+
+                            <!-- Column 5: Core Outputs -->
+                            <div class="schema-flow-col">
+                                <div class="schema-group-title"><i class="fa-solid fa-square-poll-vertical"></i> Progressive Logs</div>
+                                
+                                <!-- interviews -->
+                                <div class="schema-table card-interviews">
+                                    <div class="table-title header-interviews">interviews</div>
+                                    <div class="table-fields">
+                                        <div class="field pk">interview_id <span>TEXT (PK)</span></div>
+                                        <div class="field">interview_owner_id <span>TEXT</span></div>
+                                        <div class="field">interview_name <span>TEXT</span></div>
+                                        <div class="field">client_id <span>TEXT</span></div>
+                                        <div class="field fk">application_id <span>TEXT (FK → applications)</span></div>
+                                        <div class="field">from_time <span>TEXT</span></div>
+                                        <div class="field">to_time <span>TEXT</span></div>
+                                        <div class="field">interview_type <span>TEXT</span></div>
+                                        <div class="field">interview_status <span>TEXT</span></div>
+                                        <div class="field">batch_name <span>TEXT</span></div>
+                                        <div class="field">cancellation_reason <span>TEXT</span></div>
+                                        <div class="field">feedback <span>TEXT</span></div>
+                                        <div class="field">created_time <span>TEXT</span></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -515,6 +546,6 @@ ORDER BY CancelCount DESC;">
         </main>
     </div>
     
-    <script src="app.js"></script>
+    <script src="app.js?v=2"></script>
 </body>
 </html>

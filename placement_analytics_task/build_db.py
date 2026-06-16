@@ -2,20 +2,27 @@ import pandas as pd
 import sqlite3
 import os
 
-excel_path = "Skill Test - Database.xlsx"
+import glob
+
 db_path = "placement_analytics_task/placement.db"
 
 # Remove existing database if any
 if os.path.exists(db_path):
     os.remove(db_path)
 
-print("Reading Excel sheets with strict string dtypes for identifier columns...")
+# Dynamically locate the data folder containing the raw CSV files
+matching_dirs = glob.glob("Skill Test - Database-Applications - DUMP*")
+if not matching_dirs:
+    raise FileNotFoundError("Raw data directory not found.")
+data_dir = matching_dirs[0]
+
+print(f"Reading CSV files from folder '{data_dir}' with strict string dtypes for identifier columns...")
 # Force ID columns as strings to prevent float precision issues (e.g. 1.599e17)
-enrol_df = pd.read_excel(excel_path, sheet_name="Enrolments", dtype={"Record Id": str, "CandidateId": str})
-cand_df = pd.read_excel(excel_path, sheet_name="Candidates", dtype={"Candidate Id": str})
-app_df = pd.read_excel(excel_path, sheet_name="Applications", dtype={"Application Id": str, "Candidate Id": str, "Job Opening Id": str})
-job_df = pd.read_excel(excel_path, sheet_name="Job Openings", dtype={"Job Opening Id": str})
-inter_df = pd.read_excel(excel_path, sheet_name="Interviews", dtype={"Interview Id": str, "Candidate Id": str, "Job Opening Id": str})
+enrol_df = pd.read_csv(os.path.join(data_dir, "Skill Test - Database-Enrolments.csv"), dtype={"Record Id": str, "CandidateId": str})
+cand_df = pd.read_csv(os.path.join(data_dir, "Skill Test - Database-Candidates.csv"), dtype={"Candidate Id": str})
+app_df = pd.read_csv(os.path.join(data_dir, "Skill Test - Database-Applications.csv"), dtype={"Application Id": str, "Candidate Id": str, "Job Opening Id": str})
+job_df = pd.read_csv(os.path.join(data_dir, "Skill Test - Database-Job Openings.csv"), dtype={"Job Opening Id": str})
+inter_df = pd.read_csv(os.path.join(data_dir, "Skill Test - Database-Interviews.csv"), dtype={"Interview Id": str, "Candidate Id": str, "Job Opening Id": str})
 
 # Normalize empty/whitespace strings to NaN
 for df in [enrol_df, cand_df, app_df, job_df, inter_df]:

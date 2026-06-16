@@ -7,3 +7,7 @@ __pycache__/
 venv/
 env/
 .env
+
+# Raw Data Directory
+Skill Test - Database-Applications*
+

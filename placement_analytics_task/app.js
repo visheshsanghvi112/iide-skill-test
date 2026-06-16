@@ -35,6 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
             tabContents.forEach(content => content.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
 
+            // Scroll main content back to top to prevent header truncation
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.scrollTop = 0;
+            }
+
             // Set header texts
             if (tabId === 'dashboard') {
                 pageTitle.innerText = "Executive Dashboard";
@@ -103,12 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Helper to Destroy Chart if Exists ---
-    function registerChart(name, chart) {
+    // --- Helper to Destroy Chart and Get Context ---
+    function prepareCanvas(name, canvasId) {
         if (charts[name]) {
             charts[name].destroy();
+            charts[name] = null;
         }
-        charts[name] = chart;
+        return document.getElementById(canvasId).getContext('2d');
     }
 
     // --- 1. Populate KPI Cards ---
@@ -127,11 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 2. Ingestion Funnel Chart ---
     function renderFunnelChart(funnel) {
-        const ctx = document.getElementById('chart-funnel').getContext('2d');
+        const ctx = prepareCanvas('funnel', 'chart-funnel');
         const labels = ['1. Registered Enrolments', '2. Placement Eligible', '3. Submitted Applications', '4. Interviewed Rounds', '5. Final Hired'];
         const values = [funnel.registered, funnel.eligible, funnel.applied, funnel.interviewed, funnel.placed];
         
-        const chart = new Chart(ctx, {
+        charts['funnel'] = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
@@ -182,16 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        registerChart('funnel', chart);
     }
 
     // --- 3. Enrolment Knock-off Reasons ---
     function renderKnockoffsChart(reasons) {
-        const ctx = document.getElementById('chart-knockoffs').getContext('2d');
+        const ctx = prepareCanvas('knockoffs', 'chart-knockoffs');
         const labels = reasons.map(r => r.knocked_off_reason);
         const values = reasons.map(r => r.count);
         
-        const chart = new Chart(ctx, {
+        charts['knockoffs'] = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: labels,
@@ -219,16 +225,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        registerChart('knockoffs', chart);
     }
 
     // --- 4. Interview Cancellations ---
     function renderCancellationsChart(cancels) {
-        const ctx = document.getElementById('chart-cancellations').getContext('2d');
+        const ctx = prepareCanvas('cancellations', 'chart-cancellations');
         const labels = cancels.map(c => c.cancellation_reason.substring(0, 25) + (c.cancellation_reason.length > 25 ? '...' : ''));
         const values = cancels.map(c => c.count);
         
-        const chart = new Chart(ctx, {
+        charts['cancellations'] = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
@@ -257,16 +262,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        registerChart('cancellations', chart);
     }
 
     // --- 5. Locations preference ---
     function renderLocationChart(locations) {
-        const ctx = document.getElementById('chart-locations').getContext('2d');
+        const ctx = prepareCanvas('locations', 'chart-locations');
         const labels = locations.map(l => l.location);
         const values = locations.map(l => l.count);
         
-        const chart = new Chart(ctx, {
+        charts['locations'] = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: labels,
@@ -292,16 +296,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        registerChart('locations', chart);
     }
 
     // --- 6. Top Skills ---
     function renderSkillsChart(skills) {
-        const ctx = document.getElementById('chart-skills').getContext('2d');
+        const ctx = prepareCanvas('skills', 'chart-skills');
         const labels = skills.map(s => s.skill).slice(0, 8);
         const values = skills.map(s => s.count).slice(0, 8);
         
-        const chart = new Chart(ctx, {
+        charts['skills'] = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
@@ -330,16 +333,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        registerChart('skills', chart);
     }
 
     // --- 7. Top Job Roles ---
     function renderRolesChart(roles) {
-        const ctx = document.getElementById('chart-roles').getContext('2d');
+        const ctx = prepareCanvas('roles', 'chart-roles');
         const labels = roles.map(r => r.role).slice(0, 6);
         const values = roles.map(r => r.count).slice(0, 6);
         
-        const chart = new Chart(ctx, {
+        charts['roles'] = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
@@ -367,12 +369,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        registerChart('roles', chart);
     }
 
     // --- 8. Batch Performance ---
     function renderBatchesChart(batches) {
-        const ctx = document.getElementById('chart-batches').getContext('2d');
+        const ctx = prepareCanvas('batches', 'chart-batches');
         
         // Take top 6 batches to avoid cluttering
         const sliced = batches.slice(0, 6);
@@ -381,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const eligible = sliced.map(b => b.eligible);
         const hired = sliced.map(b => b.hired);
         
-        const chart = new Chart(ctx, {
+        charts['batches'] = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
@@ -433,7 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        registerChart('batches', chart);
     }
 
     // --- 9. Populate Discrepancy Table ---

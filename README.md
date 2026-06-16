@@ -16,8 +16,30 @@ During the initial data profiling stage, a critical data integrity issue was dis
 
 To connect the five distinct datasets (Enrolments, Candidates, Job Openings, Applications, and Interviews), we designed a normalized **Third Normal Form (3NF)** relational database structure using SQLite.
 
+### Simplified Data Architecture breakdown:
+
+| Raw Data Spreadsheets (Before) | Our Clean Database (After) | Why this is better |
+| :--- | :--- | :--- |
+| **ID Precision Corruption**: Candidate IDs are 18-digit numbers. Excel/Sheets converts them to numbers and rounds them, turning `159941000007258288` into `159941000007258270` (losing the last digits). | **Stored as Text**: We force all IDs to be read and stored as strings so not a single character is lost. | **No broken links**: Ensures candidates always map to their correct profiles. |
+| **Redundant Columns**: The `Applications` sheet repeats the student's name, email, and phone number for every single job they apply to. | **Linked Reference (`candidate_id`)**: We removed student names/emails from the applications table. We fetch them dynamically from the `candidates` table when needed. | **Single Source of Truth**: If a student changes their phone number, you update it in **one** place (candidates), not in 50 different applications. |
+| **Broken Logic**: The `Interviews` sheet logs a candidate ID and a job ID separately, independent of whether they actually applied first. | **Linked via Application (`application_id`)**: Interviews are linked directly to an active application. | **Logical Flow**: Prevents scheduling an interview for a job the candidate never applied to. |
+
+### How the Tables Connect (The Entity-Relationship Flow):
+
+```mermaid
+graph TD
+    enrolments["1. Enrolments <br> (Master list of all registered students)"] 
+    -->|candidate_id| candidates["2. Candidates <br> (Subset of eligible students)"]
+    
+    candidates -->|candidate_id| applications["4. Applications <br> (Maps candidates to job openings)"]
+    job_openings["3. Job Openings <br> (Corporate job postings)"] -->|job_opening_id| applications
+    
+    applications -->|application_id| interviews["5. Interviews <br> (Logs individual interview rounds)"]
+```
+
 ### Relational Schema (ERD Model)
 The entities and their relationships are mapped as follows:
+
 
 ```text
   [enrolments]
@@ -93,7 +115,7 @@ To let the recruiting manager test queries and play with the database directly, 
 ### 1. Install Dependencies
 Make sure you have python installed, then run:
 ```bash
-pip install pandas openpyxl flask
+pip install pandas flask
 ```
 
 ### 2. Compile Database
