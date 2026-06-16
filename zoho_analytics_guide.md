@@ -189,21 +189,44 @@ ORDER BY "Count" DESC
 4. Save as: `Knockoff Reasons`
 
 ### Step 17 — Top Skills (from eligible candidates)
+
+> [!WARNING]
+> **The `Skill Set` column is a comma-separated blob** — one long string of all skills per candidate (e.g. `"SEMrush, Google Analytics, Marketing, Canva, ..."`). A simple `GROUP BY "Skill Set"` gives count = 1 for every row because no two candidates have the exact same string. Zoho Analytics SQL cannot split strings natively.
+>
+> **Fix:** Use `LIKE` to check if each candidate's skill set **contains** a specific skill. The top 12 skills below are verified from the actual data.
+
 1. Click **"Create" → "Query Table"**.
-2. Paste:
+2. Paste this SQL:
 
 ```sql
-SELECT 
-    "Skill Set" AS "Skill",
-    COUNT("Candidate Id") AS "Count"
-FROM "Candidates"
-WHERE "Skill Set" IS NOT NULL
-  AND "Skill Set" != ''
-GROUP BY "Skill Set"
+SELECT 'Google Ads' AS "Skill", COUNT(*) AS "Count" FROM "Candidates" WHERE "Skill Set" LIKE '%Google Ads%'
+UNION ALL
+SELECT 'eMarketing', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%eMarketing%'
+UNION ALL
+SELECT 'Search Engine Optimisation', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Search Engine Optimisation%'
+UNION ALL
+SELECT 'Keyword Research', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Keyword Research%'
+UNION ALL
+SELECT 'Marketing', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Marketing%'
+UNION ALL
+SELECT 'Canva', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Canva%'
+UNION ALL
+SELECT 'Social Media', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Social Media%'
+UNION ALL
+SELECT 'Social Media Marketing', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Social Media Marketing%'
+UNION ALL
+SELECT 'Content Strategy', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Content Strategy%'
+UNION ALL
+SELECT 'Google Analytics', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Google Analytics%'
+UNION ALL
+SELECT 'Adaptability', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Adaptability%'
+UNION ALL
+SELECT 'Competitor Analysis', COUNT(*) FROM "Candidates" WHERE "Skill Set" LIKE '%Competitor Analysis%'
 ORDER BY "Count" DESC
 ```
 
-3. Execute, verify results. Save as: `Top Skills`
+3. Execute — you should see 12 rows with real counts (not all 1s).
+4. Save as: `Top Skills`
 
 ### Step 18 — Recruiter Discrepancy Audit
 *(Hired in Enrolments but no matching applications/interviews)*
