@@ -2,6 +2,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Current Chart instances registry (to destroy and rebuild on reload)
     const charts = {};
 
+    // Global Chart.js defaults
+    Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.plugins.tooltip.backgroundColor = '#0f172a';
+    Chart.defaults.plugins.tooltip.titleColor = '#f1f5f9';
+    Chart.defaults.plugins.tooltip.bodyColor = '#94a3b8';
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.displayColors = false;
+    Chart.defaults.animation.duration = 600;
+    Chart.defaults.animation.easing = 'easeOutQuart';
+
     // Elements
     const navItems = document.querySelectorAll('.nav-item');
     const tabContents = document.querySelectorAll('.tab-content');
