@@ -4,11 +4,94 @@ This project is a complete technical and analytical submission for the Placement
 
 ---
 
-## Technical Overview & Ingestion Profiling
+## Raw Data Inconsistencies (Per-CSV Audit)
 
-During the initial data profiling stage, a critical data integrity issue was discovered in the spreadsheets:
-* **The Candidate ID Precision Issue**: Candidate IDs are 18-digit numbers (e.g., `159941000007258288`). Spreadsheet software and standard float conversions truncate values larger than 15 digits, resulting in precision loss (e.g., corrupting the ID to `159941000007258272`). This would cause relational integrity checks to fail.
-* **The Solution**: All ID fields are ingested strictly as text (`str`) throughout our processing pipeline to maintain absolute referential accuracy.
+> All findings below were verified by running an automated audit directly against the original, unmodified CSV files. The raw files were **never altered** — findings were handled during the database ingestion step only.
+
+---
+
+### 1. Enrolments CSV (113 rows)
+
+| Inconsistency | Count | Details |
+|:---|:---|:---|
+| **Missing CandidateId** | 75 of 113 rows | 66% of enrolment records have no linked `CandidateId`. These are students not yet moved to the Candidates table — early-stage enrolments only. |
+| **Knocked Off with no reason** | 1 row | 1 student has `Stage = 'Knocked Off'` but the `Knocked Off Reason` field is blank — incomplete data entry. |
+| **Stage/Reason mismatch** | 0 | All other `Knocked Off Reason` entries correctly correspond to `Stage = 'Knocked Off'`. No false fills. |
+| **Duplicate emails** | 0 | Each student enrolled once — no re-enrolments. |
+
+**Distinct Stage values confirmed:** `Hired`, `Initiate Placement`, `Knocked Off`, `Not Eligible for Placement Outreach`, `On Hold`, `Outreach Initiated`
+
+---
+
+### 2. Candidates CSV (38 rows)
+
+| Inconsistency | Count | Details |
+|:---|:---|:---|
+| **NULL Preferred Job Location** | 13 of 38 (34%) | Over a third of candidates never filled this field. Affects location-based matching. |
+| **Duplicate Candidate IDs** | 0 | All IDs are unique. |
+| **Duplicate emails** | 0 | All emails are unique. |
+| **NULL Skill Set** | 0 | All candidates have skills listed (though stored as a single comma-separated blob — not individual rows). |
+
+> **Note:** `Skill Set` stores all skills as one long comma-separated string (e.g., `"Google Ads, SEMrush, Canva, ..."`). SQL `GROUP BY` on this column gives count = 1 per person — individual skill extraction requires a `LIKE`-based approach.
+
+---
+
+### 3. Applications CSV (782 rows)
+
+| Inconsistency | Count | Details |
+|:---|:---|:---|
+| **Redundant columns** | 4 columns, 782 rows each | `First Name`, `Last Name`, `Email`, `Phone` are fully duplicated from the Candidates table in every single application row. This violates 3NF. |
+| **No Application Id column in Interviews** | — | The Interviews CSV has no `Application Id` — it only carries `Candidate Id` + `Job Opening Id`, requiring a lookup join to resolve. |
+| **Duplicate Candidate+Job combinations** | 0 | No candidate applied to the same job twice. |
+| **NULL key fields** | 0 | All Application IDs, Candidate IDs, and Job IDs are present. |
+
+**Distinct Application Stage:** `Archived`, `Associated`, `Hired`, `Interview`, `On Hold`, `Rejected`, `Submissions`
+
+---
+
+### 4. Interviews CSV (121 rows)
+
+| Inconsistency | Count | Details |
+|:---|:---|:---|
+| **NULL Interview Status** | 27 of 121 (22.3%) | Over one-fifth of interview records have no outcome status recorded. These are rounds that happened but were never closed/updated in the system. |
+| **No Application Id column** | — | Structurally broken link — interviews reference `Candidate Id` + `Job Opening Id` directly instead of pointing to a specific application. Resolved during ingestion by doing a lookup join. |
+| **Cancelled but no reason** | 0 | All cancelled interviews have a reason filled. |
+| **Reason filled but not Cancelled** | 0 | No false/inconsistent cancellation reason entries. |
+
+**Distinct Interview Status values:** `Cancelled`, `Hired`, `Move to Next Round/Process`, `Needs More Mentoring`, `On-Hold`, `Rejected`, `Rescheduled`
+
+---
+
+### 5. Job Openings CSV (7,708 rows)
+
+| Inconsistency | Count | Details |
+|:---|:---|:---|
+| **Content duplicates** (same Title+City+JobType, different IDs) | 3,150 rows | The recruiting system created multiple new job postings for identical roles. E.g., `"Social Media Executive, Mumbai, Full time"` appears **177 times** with unique IDs. |
+| **Fully identical rows** (all fields same, different ID) | 151 rows | 151 records are 100% duplicate content — same title, city, salary, profile — only the `Job Opening Id` differs. |
+| **NULL City** | 1,188 of 7,708 (15.4%) | 15% of postings have no city specified — likely remote/unspecified roles or data entry omissions. |
+| **NULL Salary** | 1,680 of 7,708 (21.8%) | Over one-fifth of job postings have no salary range listed. |
+| **NULL Posting Title** | 2 rows | 2 job postings with no title at all. |
+| **NULL Job Opening Status** | 1 row | 1 posting with no status. |
+| **Only 289 of 7,708 are active** | 3.7% | The vast majority are `Cancelled` (2,926), `Unverified` (1,524), or `Inactive` (1,005). The headline KPI of 7,708 includes all historical postings. |
+
+**Job Opening Status breakdown:**
+- Cancelled: 2,926 | Unverified: 1,524 | Inactive: 1,005 | Filled: 796
+- Declined: 751 | On-Hold: 416 | **In-progress: 289** | NULL: 1
+
+---
+
+### How These Were Handled in the Database Pipeline
+
+| Inconsistency | Handling Approach |
+|:---|:---|
+| 18-digit ID float corruption | `dtype=str` on all ID columns during `pd.read_csv()` |
+| Whitespace-only empty cells | Global regex replace to `NULL` across all 5 dataframes |
+| Enrolments with no CandidateId | Stored as `NULL` with `ON DELETE SET NULL` foreign key |
+| Applications referencing missing candidates/jobs | Row skipped entirely with a warning printed |
+| Interviews with no Application Id | Resolved via `candidate_id + job_opening_id` lookup join |
+| Redundant columns in Applications | Dropped — not inserted into normalized schema |
+| Job Opening content duplicates | Not deduplicated — preserved as-is (source system issue) |
+| Recruiter workflow discrepancies | Surfaced in dashboard audit table, not silently corrected |
 
 ---
 
@@ -95,9 +178,9 @@ The pipeline reveals the progression of candidates through successive recruitmen
 * **Student Knock-offs**: 23 students were knocked off the funnel during master enrolment, primarily due to "No Response" (engagement gap) and "Dropout/Personal reasons".
 
 ### 3. Recruiter Compliance Discrepancies
-The dashboard contains a discrepancy auditor that flagged **5 candidates** marked as `Hired` in Enrolments but lacking complete recruiter workflows:
-* **Naomi Bennett**, **Eva Hughes**, and **Madison Young**: Marked 'Hired' but have **0 applications or interviews** logged. This indicates placements occurring off-platform.
-* **Henry Gonzalez** and **Abigail Sanchez**: Have active applications but their final status was never updated in the applications tracker.
+The dashboard contains a discrepancy auditor that flagged **6 candidates** marked as `Hired` in Enrolments but lacking complete recruiter workflows:
+* **Naomi Bennett**, **Eva Hughes**, and **Madison Young**: Marked 'Hired' but have **0 applications or interviews** logged. Indicates off-platform placements with no system trail.
+* **Henry Gonzalez**, **Penelope Mitchell**, and **Aria Martin**: Have active applications submitted but **0 interview rounds** ever logged — recruiter status was never updated.
 
 ---
 
