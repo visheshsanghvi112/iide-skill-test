@@ -1,0 +1,52 @@
+{
+  "version": 2,
+  "name": "placement-analytics-dashboard",
+  "builds": [
+    {
+      "src": "placement_analytics_task/index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "placement_analytics_task/style.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "placement_analytics_task/app.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "placement_analytics_task/placement.db",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "api/dashboard-stats.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/query.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/dashboard-stats",
+      "dest": "/api/dashboard-stats.py"
+    },
+    {
+      "src": "/api/query",
+      "dest": "/api/query.py"
+    },
+    {
+      "src": "/style.css",
+      "dest": "/placement_analytics_task/style.css"
+    },
+    {
+      "src": "/app.js",
+      "dest": "/placement_analytics_task/app.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/placement_analytics_task/index.html"
+    }
+  ]
+}
