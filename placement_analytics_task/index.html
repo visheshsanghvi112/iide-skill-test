@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
     <div class="app-container">
@@ -386,40 +386,111 @@
                                 </div>
                             </div>
 
-                            <!-- SVG Relationship Arrows -->
-                            <svg class="erd-svg" xmlns="http://www.w3.org/2000/svg">
-                                <!-- enrolments → candidates (1:0..1) -->
-                                <defs>
-                                    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                                        <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/>
-                                    </marker>
-                                    <marker id="arrow-fk" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                                        <path d="M0,0 L0,6 L8,3 z" fill="#7c3aed"/>
-                                    </marker>
-                                    <marker id="arrow-app" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                                        <path d="M0,0 L0,6 L8,3 z" fill="#059669"/>
-                                    </marker>
-                                </defs>
+                            <!-- SVG Relationship Connectors — Crow's Foot Notation -->
+                            <svg class="erd-svg" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
 
-                                <!-- enrolments → candidates: candidate_id (nullable) -->
-                                <line x1="320" y1="90" x2="375" y2="90" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
-                                <text x="330" y="82" fill="#64748b" font-size="10" font-family="Inter,sans-serif">candidate_id</text>
-                                <text x="330" y="94" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">1 : 0..1</text>
+                              <!--
+                                Layout reference (all px):
+                                  enrolments:   left=20,  top=30,  width=240  → right edge x=260
+                                  candidates:   left=380, top=30,  width=240  → left x=380, right x=620
+                                  job_openings: left=380, top=370, width=240  → left x=380, right x=620
+                                  applications: left=740, top=200, width=240  → left x=740, right x=980
+                                  interviews:   left=1100,top=200, width=240  → left x=1100
 
-                                <!-- candidates → applications: candidate_id -->
-                                <line x1="620" y1="130" x2="735" y2="270" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-fk)"/>
-                                <text x="645" y="190" fill="#7c3aed" font-size="10" font-family="Inter,sans-serif">candidate_id</text>
-                                <text x="645" y="203" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">1 : N</text>
+                                Field row height ≈ 26px, header ≈ 50px
+                                  Row Y = top + 50 + 13 + (rowIndex × 26)
+                              -->
 
-                                <!-- job_openings → applications: job_opening_id -->
-                                <line x1="620" y1="460" x2="735" y2="340" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-fk)"/>
-                                <text x="638" y="408" fill="#7c3aed" font-size="10" font-family="Inter,sans-serif">job_opening_id</text>
-                                <text x="648" y="420" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">1 : N</text>
+                              <!-- ════════════════════════════════════════════════════════
+                                   CONNECTOR A: enrolments → candidates
+                                   Type: 1 : 0..1  (nullable FK — dashed)
+                                   FROM: enrolments right edge at FK row (row 2) y≈116
+                                   TO:   candidates left edge at PK row (row 1) y≈92
+                                   Route: M 260,116  H 320  V 92  H 380
+                              ════════════════════════════════════════════════════════ -->
+                              <path d="M 260,116 H 320 V 92 H 374" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="6,3"/>
 
-                                <!-- applications → interviews: application_id -->
-                                <line x1="980" y1="290" x2="1095" y2="290" stroke="#059669" stroke-width="2" marker-end="url(#arrow-app)"/>
-                                <text x="990" y="283" fill="#059669" font-size="10" font-family="Inter,sans-serif">application_id</text>
-                                <text x="1000" y="296" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">1 : N</text>
+                              <!-- "1" notation at enrolments end (double vertical bar) -->
+                              <line x1="263" y1="104" x2="263" y2="128" stroke="#94a3b8" stroke-width="2.5"/>
+                              <line x1="259" y1="104" x2="259" y2="128" stroke="#94a3b8" stroke-width="2.5"/>
+
+                              <!-- "0..1" notation at candidates end: circle + single bar -->
+                              <circle cx="362" cy="92" r="7" fill="white" stroke="#94a3b8" stroke-width="1.8"/>
+                              <line x1="374" y1="80" x2="374" y2="104" stroke="#94a3b8" stroke-width="2.5"/>
+
+                              <!-- Connector A label pill -->
+                              <rect x="284" y="68" width="44" height="17" rx="5" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+                              <text x="306" y="81" text-anchor="middle" fill="#64748b" font-size="9.5" font-family="Inter,sans-serif" font-weight="700">1 : 0..1</text>
+
+                              <!-- ════════════════════════════════════════════════════════
+                                   CONNECTOR B: candidates → applications
+                                   Type: 1 : N
+                                   FROM: candidates right edge, mid-table y≈154
+                                   TO:   applications left edge at FK candidate_id (row 2) y≈286
+                                   Route: M 620,154  H 680  V 286  H 734
+                              ════════════════════════════════════════════════════════ -->
+                              <path d="M 620,154 H 680 V 286 H 734" fill="none" stroke="#7c3aed" stroke-width="2"/>
+
+                              <!-- "1" at candidates end (double bar) -->
+                              <line x1="617" y1="142" x2="617" y2="166" stroke="#7c3aed" stroke-width="2.5"/>
+                              <line x1="621" y1="142" x2="621" y2="166" stroke="#7c3aed" stroke-width="2.5"/>
+
+                              <!-- Crow's foot "N" at applications left edge (arriving from left) -->
+                              <line x1="734" y1="286" x2="714" y2="273" stroke="#7c3aed" stroke-width="2"/>
+                              <line x1="734" y1="286" x2="714" y2="286" stroke="#7c3aed" stroke-width="2"/>
+                              <line x1="734" y1="286" x2="714" y2="299" stroke="#7c3aed" stroke-width="2"/>
+                              <line x1="712" y1="271" x2="712" y2="301" stroke="#7c3aed" stroke-width="2.5"/>
+
+                              <!-- Connector B label pill -->
+                              <rect x="654" y="208" width="28" height="17" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1"/>
+                              <text x="668" y="221" text-anchor="middle" fill="#7c3aed" font-size="9.5" font-family="Inter,sans-serif" font-weight="700">1:N</text>
+
+                              <!-- ════════════════════════════════════════════════════════
+                                   CONNECTOR C: job_openings → applications
+                                   Type: 1 : N
+                                   FROM: job_openings right edge, mid-table y≈494
+                                   TO:   applications left edge at FK job_opening_id (row 3) y≈312
+                                   Route: M 620,494  H 680  V 312  H 734
+                              ════════════════════════════════════════════════════════ -->
+                              <path d="M 620,494 H 680 V 312 H 734" fill="none" stroke="#f59e0b" stroke-width="2"/>
+
+                              <!-- "1" at job_openings end (double bar) -->
+                              <line x1="617" y1="482" x2="617" y2="506" stroke="#f59e0b" stroke-width="2.5"/>
+                              <line x1="621" y1="482" x2="621" y2="506" stroke="#f59e0b" stroke-width="2.5"/>
+
+                              <!-- Crow's foot "N" at applications left edge (row 3) -->
+                              <line x1="734" y1="312" x2="714" y2="299" stroke="#f59e0b" stroke-width="2"/>
+                              <line x1="734" y1="312" x2="714" y2="312" stroke="#f59e0b" stroke-width="2"/>
+                              <line x1="734" y1="312" x2="714" y2="325" stroke="#f59e0b" stroke-width="2"/>
+                              <line x1="712" y1="297" x2="712" y2="327" stroke="#f59e0b" stroke-width="2.5"/>
+
+                              <!-- Connector C label pill -->
+                              <rect x="654" y="390" width="28" height="17" rx="5" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+                              <text x="668" y="403" text-anchor="middle" fill="#b45309" font-size="9.5" font-family="Inter,sans-serif" font-weight="700">1:N</text>
+
+                              <!-- ════════════════════════════════════════════════════════
+                                   CONNECTOR D: applications → interviews
+                                   Type: 1 : N
+                                   FROM: applications right edge at application_id level y≈286
+                                   TO:   interviews left edge at FK row (row 2) y≈286
+                                   Route: straight horizontal M 980,286 H 1094  (same Y)
+                              ════════════════════════════════════════════════════════ -->
+                              <path d="M 980,286 H 1094" fill="none" stroke="#059669" stroke-width="2"/>
+
+                              <!-- "1" at applications end (double bar) -->
+                              <line x1="983" y1="274" x2="983" y2="298" stroke="#059669" stroke-width="2.5"/>
+                              <line x1="987" y1="274" x2="987" y2="298" stroke="#059669" stroke-width="2.5"/>
+
+                              <!-- Crow's foot "N" at interviews left edge -->
+                              <line x1="1094" y1="286" x2="1074" y2="273" stroke="#059669" stroke-width="2"/>
+                              <line x1="1094" y1="286" x2="1074" y2="286" stroke="#059669" stroke-width="2"/>
+                              <line x1="1094" y1="286" x2="1074" y2="299" stroke="#059669" stroke-width="2"/>
+                              <line x1="1072" y1="271" x2="1072" y2="301" stroke="#059669" stroke-width="2.5"/>
+
+                              <!-- Connector D label pill -->
+                              <rect x="1014" y="268" width="28" height="17" rx="5" fill="#dcfce7" stroke="#059669" stroke-width="1"/>
+                              <text x="1028" y="281" text-anchor="middle" fill="#059669" font-size="9.5" font-family="Inter,sans-serif" font-weight="700">1:N</text>
+
                             </svg>
 
                         </div>
