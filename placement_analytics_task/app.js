@@ -146,14 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     label: 'Candidates Count',
                     data: values,
                     backgroundColor: [
-                        'rgba(138, 43, 226, 0.45)', // Purple
-                        'rgba(0, 240, 255, 0.45)',  // Cyan
-                        'rgba(0, 255, 136, 0.45)',  // Green
-                        'rgba(255, 183, 0, 0.45)',  // Orange
-                        'rgba(255, 51, 102, 0.45)'   // Red
+                        'rgba(12, 95, 244, 0.7)',   // Zoho Blue
+                        'rgba(14, 165, 233, 0.7)',  // Cyan
+                        'rgba(16, 185, 129, 0.7)',  // Emerald Green
+                        'rgba(245, 158, 11, 0.7)',  // Amber Orange
+                        'rgba(244, 63, 94, 0.7)'    // Rose Red
                     ],
                     borderColor: [
-                        '#8a2be2', '#00f0ff', '#00ff88', '#ffb700', '#ff3366'
+                        '#0c5ff4', '#0ea5e9', '#10b981', '#f59e0b', '#f43f5e'
                     ],
                     borderWidth: 1.5,
                     borderRadius: 6,
@@ -179,12 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 scales: {
                     y: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#8c88af' }
+                        grid: { color: 'rgba(0,0,0,0.06)' },
+                        ticks: { color: '#64748b' }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: '#8c88af', font: { size: 11 } }
+                        ticks: { color: '#64748b', font: { size: 11 } }
                     }
                 }
             }
@@ -204,14 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     data: values,
                     backgroundColor: [
-                        'rgba(255, 51, 102, 0.65)',
-                        'rgba(138, 43, 226, 0.65)',
-                        'rgba(255, 183, 0, 0.65)',
-                        'rgba(0, 240, 255, 0.65)',
-                        'rgba(0, 255, 136, 0.65)'
+                        'rgba(244, 63, 94, 0.75)',
+                        'rgba(124, 58, 237, 0.75)',
+                        'rgba(245, 158, 11, 0.75)',
+                        'rgba(14, 165, 233, 0.75)',
+                        'rgba(16, 185, 129, 0.75)'
                     ],
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    borderWidth: 1
+                    borderColor: '#ffffff',
+                    borderWidth: 1.5
                 }]
             },
             options: {
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     legend: {
                         position: 'right',
-                        labels: { color: '#8c88af', font: { size: 10 } }
+                        labels: { color: '#64748b', font: { size: 10 } }
                     }
                 }
             }
@@ -239,9 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels: labels,
                 datasets: [{
                     data: values,
-                    backgroundColor: 'rgba(255, 183, 0, 0.5)',
-                    borderColor: '#ffb700',
-                    borderWidth: 1,
+                    backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                    borderColor: '#f59e0b',
+                    borderWidth: 1.5,
                     borderRadius: 4
                 }]
             },
@@ -252,12 +252,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: { legend: { display: false } },
                 scales: {
                     x: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#8c88af' }
+                        grid: { color: 'rgba(0,0,0,0.06)' },
+                        ticks: { color: '#64748b' }
                     },
                     y: {
                         grid: { display: false },
-                        ticks: { color: '#8c88af', font: { size: 10 } }
+                        ticks: { color: '#64748b', font: { size: 10 } }
                     }
                 }
             }
@@ -277,12 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     data: values,
                     backgroundColor: [
-                        'rgba(0, 240, 255, 0.6)',
-                        'rgba(138, 43, 226, 0.6)',
-                        'rgba(255, 51, 102, 0.6)'
+                        'rgba(14, 165, 233, 0.75)',
+                        'rgba(124, 58, 237, 0.75)',
+                        'rgba(244, 63, 94, 0.75)'
                     ],
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    borderWidth: 1
+                    borderColor: '#ffffff',
+                    borderWidth: 1.5
                 }]
             },
             options: {
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { color: '#8c88af', font: { size: 11 } }
+                        labels: { color: '#64748b', font: { size: 11 } }
                     }
                 }
             }
@@ -310,9 +310,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels: labels,
                 datasets: [{
                     data: values,
-                    backgroundColor: 'rgba(0, 255, 136, 0.5)',
-                    borderColor: '#00ff88',
-                    borderWidth: 1,
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                    borderColor: '#10b981',
+                    borderWidth: 1.5,
                     borderRadius: 4
                 }]
             },
@@ -323,12 +323,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: { legend: { display: false } },
                 scales: {
                     x: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#8c88af' }
+                        grid: { color: 'rgba(0,0,0,0.06)' },
+                        ticks: { color: '#64748b' }
                     },
                     y: {
                         grid: { display: false },
-                        ticks: { color: '#8c88af', font: { size: 10 } }
+                        ticks: { color: '#64748b', font: { size: 10 } }
                     }
                 }
             }
@@ -347,9 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels: labels,
                 datasets: [{
                     data: values,
-                    backgroundColor: 'rgba(0, 240, 255, 0.5)',
-                    borderColor: '#00f0ff',
-                    borderWidth: 1,
+                    backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                    borderColor: '#0ea5e9',
+                    borderWidth: 1.5,
                     borderRadius: 4
                 }]
             },
@@ -359,12 +359,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: { legend: { display: false } },
                 scales: {
                     y: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#8c88af' }
+                        grid: { color: 'rgba(0,0,0,0.06)' },
+                        ticks: { color: '#64748b' }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: '#8c88af', font: { size: 9 } }
+                        ticks: { color: '#64748b', font: { size: 9 } }
                     }
                 }
             }
@@ -390,25 +390,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     {
                         label: 'Registered',
                         data: registered,
-                        backgroundColor: 'rgba(138, 43, 226, 0.4)',
-                        borderColor: '#8a2be2',
-                        borderWidth: 1,
+                        backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                        borderColor: '#7c3aed',
+                        borderWidth: 1.5,
                         borderRadius: 4
                     },
                     {
                         label: 'Eligible (Candidates)',
                         data: eligible,
-                        backgroundColor: 'rgba(0, 240, 255, 0.4)',
-                        borderColor: '#00f0ff',
-                        borderWidth: 1,
+                        backgroundColor: 'rgba(14, 165, 233, 0.6)',
+                        borderColor: '#0ea5e9',
+                        borderWidth: 1.5,
                         borderRadius: 4
                     },
                     {
                         label: 'Placed (Hired)',
                         data: hired,
-                        backgroundColor: 'rgba(0, 255, 136, 0.4)',
-                        borderColor: '#00ff88',
-                        borderWidth: 1,
+                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                        borderColor: '#10b981',
+                        borderWidth: 1.5,
                         borderRadius: 4
                     }
                 ]
@@ -419,17 +419,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: { color: '#8c88af', font: { size: 10 } }
+                        labels: { color: '#64748b', font: { size: 10 } }
                     }
                 },
                 scales: {
                     y: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#8c88af' }
+                        grid: { color: 'rgba(0,0,0,0.06)' },
+                        ticks: { color: '#64748b' }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: '#8c88af', font: { size: 10 } }
+                        ticks: { color: '#64748b', font: { size: 10 } }
                     }
                 }
             }
