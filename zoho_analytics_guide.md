@@ -229,9 +229,15 @@ ORDER BY "Count" DESC
 4. Save as: `Top Skills`
 
 ### Step 18 — Recruiter Discrepancy Audit
-*(Hired in Enrolments but no matching applications/interviews)*
+*(Hired in Enrolments but missing application or interview records)*
+
+> [!IMPORTANT]
+> **Why the previous query gave wrong results:**
+> The raw Interviews CSV has **no `Application Id`** column — it only has `Candidate Id` and `Job Opening Id`.
+> Joining Interviews on just `Candidate Id` alone inflates counts because one candidate may have interviews for multiple jobs. The correct approach is to join on **both** `Candidate Id` AND `Job Opening Id` together through Applications.
+
 1. Click **"Create" → "Query Table"**.
-2. Paste:
+2. Paste this corrected SQL:
 
 ```sql
 SELECT 
@@ -242,14 +248,27 @@ SELECT
 FROM "Enrolments" e
 LEFT JOIN "Candidates" c ON e."CandidateId" = c."Candidate Id"
 LEFT JOIN "Applications" a ON c."Candidate Id" = a."Candidate Id"
-LEFT JOIN "Interviews" i ON c."Candidate Id" = i."Candidate Id"
+LEFT JOIN "Interviews" i 
+    ON a."Candidate Id" = i."Candidate Id" 
+    AND a."Job Opening Id" = i."Job Opening Id"
 WHERE e."Stage" = 'Hired'
 GROUP BY "Student Name", "Enrolment Stage"
 HAVING COUNT(DISTINCT a."Application Id") = 0
     OR COUNT(DISTINCT i."Interview Id") = 0
+ORDER BY "Applications Count" ASC
 ```
 
-3. Execute — should return 5 students (Naomi Bennett, Eva Hughes, Madison Young, Henry Gonzalez, Abigail Sanchez).
+3. Execute — expected **6 students**:
+
+| Student Name | Applications Count | Interviews Count | Meaning |
+|:---|:---|:---|:---|
+| Eva Hughes | 0 | 0 | Off-platform hire, no recruiter trail |
+| Madison Young | 0 | 0 | Off-platform hire, no recruiter trail |
+| Naomi Bennett | 0 | 0 | Off-platform hire, no recruiter trail |
+| Henry Gonzalez | 3 | 0 | Applied but no interviews logged |
+| Penelope Mitchell | 9 | 0 | Applied but no interviews logged |
+| Aria Martin | 24 | 0 | Applied but no interviews logged |
+
 4. Save as: `Discrepancy Audit`
 
 ---
